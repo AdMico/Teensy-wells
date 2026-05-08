@@ -7,7 +7,7 @@
 //
 
 const int ledPin = LED_BUILTIN; // Pin 13
-int blinkTime = 50; //blink time in milliseconds
+int blinkTime = 150; //blink time in milliseconds
 
 void setup() {
   pinMode(ledPin, OUTPUT);
