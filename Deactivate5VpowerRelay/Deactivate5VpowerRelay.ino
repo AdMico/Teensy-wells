@@ -11,8 +11,7 @@
 
 int led1Pin = 19; // +5V GND
 
-int wait1 = 500;
-int wait2 = 500;
+int wait1 = 2; // set to 2ms to guarantee operation
 bool hasRun = false;
 
 void setup() {
@@ -25,7 +24,6 @@ void loop() {
     digitalWrite(led1Pin,HIGH);
     delay(wait1);
     digitalWrite(led1Pin,LOW);
-    delay(wait2);
 
     hasRun = true;
   }

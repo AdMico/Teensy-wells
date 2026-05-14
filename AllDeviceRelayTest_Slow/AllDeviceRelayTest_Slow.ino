@@ -73,10 +73,10 @@ void loop() {
     
     // Make sure the 5V power line is active, otherwise the other relays won't switch.
     //Serial.println("+5V Active");
-    //digitalWriteFast(20,HIGH);
-    //delay(wait1);
-    //digitalWriteFast(20,LOW);
-    //delay(wait3);
+    digitalWriteFast(20,HIGH);
+    delay(wait1);
+    digitalWriteFast(20,LOW);
+    delay(wait3);
 
     //Serial.println("W-1");
     digitalWriteFast(1,HIGH);

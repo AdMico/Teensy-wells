@@ -3,7 +3,7 @@
 //
 // @developers: Adam Micolich
 //
-// Basic algorithm for testing one specific control relays.
+// Basic algorithm for testing one specific control relay.
 // It will flip the relay to NO, pause, then flip the relay to NC (default).
 // Has no interaction with PyNE-wells code, it's purely for hardware test, and should be used with the Teensy in the MuxBox.
 //
@@ -21,8 +21,9 @@
 // V1-NonInv = 29; V1-Inv (def) = 30; V2-NonInv = 31; V2-Inv (def) = 32; I1-Hi = 33; I1-Lo (def) = 34; I2-Hi = 35; I2-Lo (def) = 36;
 // I1-CSA = 37; I1-TIA (def) = 38; I2-CSA = 39; I2-TIA (def) = 40.
 
-int wait1 = 2000; // time in microseconds
-int wait2 = 100000; // time in microseconds
+int wait1 = 2; // Time relay coil is active
+int wait2 = 100; // Time between on and off
+int wait3 = 1000; // Time before the next relay
 int count = 5; // Number of times to switch the relay
 int counter = 0;
 bool hasRun = false;
@@ -66,8 +67,14 @@ void loop() {
     digitalWriteFast(11,LOW);
     digitalWriteFast(12,LOW);
 
+    // Make sure the 5V power line is active, otherwise the other relays won't switch.
+    //Serial.println("+5V Active");
+    digitalWriteFast(20,HIGH);
+    delay(wait1);
+    digitalWriteFast(20,LOW);
+    delay(wait3);
 
-    Serial.println("Word-1");
+    //Serial.println("Word-1"); -- Adjust to which ever relay you need to test.
     digitalWriteFast(1,HIGH);
     digitalWriteFast(2,LOW);
     digitalWriteFast(3,LOW);
@@ -75,13 +82,13 @@ void loop() {
     digitalWriteFast(5,LOW);
     digitalWriteFast(6,LOW);
     digitalWriteFast(16,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(16,LOW);
-    delayMicroseconds(wait2);
+    delay(wait2);
     digitalWriteFast(15,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(15,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     // Set all control bits to OFF
     digitalWriteFast(1,LOW);

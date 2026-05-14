@@ -3,7 +3,7 @@
 //
 // @developers: Adam Micolich
 //
-// Basic algorithm for testing all 14 control relays.
+// Basic algorithm for testing all 14 control relays and all 54 device relays.
 // It will cycle through bringing each relay one by one first to NO, then back to NC (default)
 // Has no interaction with PyNE-wells code, it's purely for hardware test, and should be used with the Teensy in the MuxBox PCB.
 //
@@ -21,15 +21,35 @@
 // V1-NonInv = 29; V1-Inv (def) = 30; V2-NonInv = 31; V2-Inv (def) = 32; I1-Hi = 33; I1-Lo (def) = 34; I2-Hi = 35; I2-Lo (def) = 36;
 // I1-CSA = 37; I1-TIA (def) = 38; I2-CSA = 39; I2-TIA (def) = 40.
 
-int count = 3; // Number of times to switch the relay set
+int count = 1; // Number of times to switch the relay set
 int counter = 0;
-int wait1 = 1000; // time in microseconds
-int wait2 = 50000; // time in microseconds
+int wait1 = 2; // Time relay coil is active
+int wait2 = 500; // Time between on and off
+int wait3 = 500; // Time before the next relay
+int wait4 = 3000; // Time between test sets
 bool hasRun = false;
 
 void setup() {
   //Serial.begin(9600);
   // initialize the digital pins as outputs
+  // Device Set
+  pinMode(1,OUTPUT); // W-EN1
+  pinMode(2,OUTPUT); // W-EN2
+  pinMode(3,OUTPUT); // W-A0
+  pinMode(4,OUTPUT); // W-A1
+  pinMode(5,OUTPUT); // W-A2
+  pinMode(6,OUTPUT); // W-A3
+  pinMode(7,OUTPUT); // B-EN1
+  pinMode(8,OUTPUT); // B-EN2
+  pinMode(9,OUTPUT); // B-A0
+  pinMode(10,OUTPUT); // B-A1
+  pinMode(11,OUTPUT); // B-A2
+  pinMode(12,OUTPUT); // B-A3
+  pinMode(15,OUTPUT); // Word Off (def)
+  pinMode(16,OUTPUT); // Word On
+  pinMode(17,OUTPUT); // Bit Off (def)
+  pinMode(18,OUTPUT); // Bit On
+  // Control Set
   pinMode(13,OUTPUT); // Bias Words (def)
   pinMode(14,OUTPUT); // Bias Bits
   pinMode(19,OUTPUT); // +5V GND (def)
@@ -54,6 +74,24 @@ void setup() {
   pinMode(38,OUTPUT); // I1-CSA
   pinMode(39,OUTPUT); // I2-TIA (def)
   pinMode(40,OUTPUT); // I2-CSA
+
+  // Set all control bits to OFF
+  digitalWriteFast(1,LOW);
+  digitalWriteFast(2,LOW);
+  digitalWriteFast(3,LOW);
+  digitalWriteFast(4,LOW);
+  digitalWriteFast(5,LOW);
+  digitalWriteFast(6,LOW);
+  digitalWriteFast(7,LOW);
+  digitalWriteFast(8,LOW);
+  digitalWriteFast(9,LOW);
+  digitalWriteFast(10,LOW);
+  digitalWriteFast(11,LOW);
+  digitalWriteFast(12,LOW);
+  digitalWriteFast(15,LOW);
+  digitalWriteFast(16,LOW);
+  digitalWriteFast(17,LOW);
+  digitalWriteFast(18,LOW);
 }
 
 void loop() {
@@ -61,158 +99,1040 @@ void loop() {
 
     // Make sure the 5V power line is active, otherwise the other relays won't switch.
     //Serial.println("+5V Active");
-    //digitalWriteFast(20,HIGH);
-    //delayMicroseconds(wait1);
-    //digitalWriteFast(20,LOW);
-    //delayMicroseconds(wait2);
+    digitalWriteFast(20,HIGH);
+    delay(wait1);
+    digitalWriteFast(20,LOW);
+    delay(wait3);
+
+    // Begin Control Relay Testing
 
     //Serial.println("Bias Bits");
     digitalWriteFast(14,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(14,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("Bias Words (def)");
     digitalWriteFast(13,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(13,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     // Run these two reversed to ensure that all following relay tests run
     //Serial.println("+5V GND (def)");
     digitalWriteFast(19,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(19,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("+5V Active");
     digitalWriteFast(20,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(20,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("Source Ext");
     digitalWriteFast(22,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(22,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("Source Int (def)");
     digitalWriteFast(21,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(21,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("Drain Ext");
     digitalWriteFast(24,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(24,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("Drain Int (def)");
     digitalWriteFast(23,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(23,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("Hold Ext");
     digitalWriteFast(26,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(26,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("Hold Int (def)");
     digitalWriteFast(25,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(25,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("Gate Ext");
     digitalWriteFast(28,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(28,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("Gate Int (def)");
     digitalWriteFast(27,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(27,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("V1-NonInv");
     digitalWriteFast(30,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(30,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("V1-Inv (def)");
     digitalWriteFast(29,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(29,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("V2-NonInv");
     digitalWriteFast(32,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(32,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("V2-Inv (def)");
     digitalWriteFast(31,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(31,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("I1-Hi");
     digitalWriteFast(34,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(34,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("I1-Lo (def)");
     digitalWriteFast(33,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(33,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("I2-Hi");
     digitalWriteFast(36,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(36,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("I2-Lo (def)");
     digitalWriteFast(35,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(35,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("I1-CSA");
     digitalWriteFast(38,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(38,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("I1-TIA (def)");
     digitalWriteFast(37,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(37,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("I2-CSA");
     digitalWriteFast(40,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(40,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("I2-TIA (def)");
     digitalWriteFast(39,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(39,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
+
+    delay(wait4);
+
+    // Begin Device Set -- Words first
+    
+    //Serial.println("W-1");
+    digitalWriteFast(1,HIGH);
+    digitalWriteFast(2,LOW);
+    digitalWriteFast(3,LOW);
+    digitalWriteFast(4,LOW);
+    digitalWriteFast(5,LOW);
+    digitalWriteFast(6,LOW);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-2");
+    digitalWriteFast(1,HIGH);
+    digitalWriteFast(2,LOW);
+    digitalWriteFast(3,HIGH);
+    digitalWriteFast(4,LOW);
+    digitalWriteFast(5,LOW);
+    digitalWriteFast(6,LOW);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-3");
+    digitalWriteFast(1,HIGH);
+    digitalWriteFast(2,LOW);
+    digitalWriteFast(3,LOW);
+    digitalWriteFast(4,HIGH);
+    digitalWriteFast(5,LOW);
+    digitalWriteFast(6,LOW);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-4");
+    digitalWriteFast(1,HIGH);
+    digitalWriteFast(2,LOW);
+    digitalWriteFast(3,HIGH);
+    digitalWriteFast(4,HIGH);
+    digitalWriteFast(5,LOW);
+    digitalWriteFast(6,LOW);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-5");
+    digitalWriteFast(1,HIGH);
+    digitalWriteFast(2,LOW);
+    digitalWriteFast(3,LOW);
+    digitalWriteFast(4,LOW);
+    digitalWriteFast(5,HIGH);
+    digitalWriteFast(6,LOW);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-6");
+    digitalWriteFast(1,HIGH);
+    digitalWriteFast(2,LOW);
+    digitalWriteFast(3,HIGH);
+    digitalWriteFast(4,LOW);
+    digitalWriteFast(5,HIGH);
+    digitalWriteFast(6,LOW);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-7");
+    digitalWriteFast(1,HIGH);
+    digitalWriteFast(2,LOW);
+    digitalWriteFast(3,LOW);
+    digitalWriteFast(4,HIGH);
+    digitalWriteFast(5,HIGH);
+    digitalWriteFast(6,LOW);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-8");
+    digitalWriteFast(1,HIGH);
+    digitalWriteFast(2,LOW);
+    digitalWriteFast(3,HIGH);
+    digitalWriteFast(4,HIGH);
+    digitalWriteFast(5,HIGH);
+    digitalWriteFast(6,LOW);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-9");
+    digitalWriteFast(1,HIGH);
+    digitalWriteFast(2,LOW);
+    digitalWriteFast(3,LOW);
+    digitalWriteFast(4,LOW);
+    digitalWriteFast(5,LOW);
+    digitalWriteFast(6,HIGH);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-10");
+    digitalWriteFast(1,HIGH);
+    digitalWriteFast(2,LOW);
+    digitalWriteFast(3,HIGH);
+    digitalWriteFast(4,LOW);
+    digitalWriteFast(5,LOW);
+    digitalWriteFast(6,HIGH);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-11");
+    digitalWriteFast(1,HIGH);
+    digitalWriteFast(2,LOW);
+    digitalWriteFast(3,LOW);
+    digitalWriteFast(4,HIGH);
+    digitalWriteFast(5,LOW);
+    digitalWriteFast(6,HIGH);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-12");
+    digitalWriteFast(1,HIGH);
+    digitalWriteFast(2,LOW);
+    digitalWriteFast(3,HIGH);
+    digitalWriteFast(4,HIGH);
+    digitalWriteFast(5,LOW);
+    digitalWriteFast(6,HIGH);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-13");
+    digitalWriteFast(1,HIGH);
+    digitalWriteFast(2,LOW);
+    digitalWriteFast(3,LOW);
+    digitalWriteFast(4,LOW);
+    digitalWriteFast(5,HIGH);
+    digitalWriteFast(6,HIGH);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-14");
+    digitalWriteFast(1,HIGH);
+    digitalWriteFast(2,LOW);
+    digitalWriteFast(3,HIGH);
+    digitalWriteFast(4,LOW);
+    digitalWriteFast(5,HIGH);
+    digitalWriteFast(6,HIGH);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-15");
+    digitalWriteFast(1,LOW);
+    digitalWriteFast(2,HIGH);
+    digitalWriteFast(3,LOW);
+    digitalWriteFast(4,LOW);
+    digitalWriteFast(5,LOW);
+    digitalWriteFast(6,LOW);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-16");
+    digitalWriteFast(1,LOW);
+    digitalWriteFast(2,HIGH);
+    digitalWriteFast(3,HIGH);
+    digitalWriteFast(4,LOW);
+    digitalWriteFast(5,LOW);
+    digitalWriteFast(6,LOW);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-17");
+    digitalWriteFast(1,LOW);
+    digitalWriteFast(2,HIGH);
+    digitalWriteFast(3,LOW);
+    digitalWriteFast(4,HIGH);
+    digitalWriteFast(5,LOW);
+    digitalWriteFast(6,LOW);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-18");
+    digitalWriteFast(1,LOW);
+    digitalWriteFast(2,HIGH);
+    digitalWriteFast(3,HIGH);
+    digitalWriteFast(4,HIGH);
+    digitalWriteFast(5,LOW);
+    digitalWriteFast(6,LOW);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-19");
+    digitalWriteFast(1,LOW);
+    digitalWriteFast(2,HIGH);
+    digitalWriteFast(3,LOW);
+    digitalWriteFast(4,LOW);
+    digitalWriteFast(5,HIGH);
+    digitalWriteFast(6,LOW);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-20");
+    digitalWriteFast(1,LOW);
+    digitalWriteFast(2,HIGH);
+    digitalWriteFast(3,HIGH);
+    digitalWriteFast(4,LOW);
+    digitalWriteFast(5,HIGH);
+    digitalWriteFast(6,LOW);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-21");
+    digitalWriteFast(1,LOW);
+    digitalWriteFast(2,HIGH);
+    digitalWriteFast(3,LOW);
+    digitalWriteFast(4,HIGH);
+    digitalWriteFast(5,HIGH);
+    digitalWriteFast(6,LOW);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-22");
+    digitalWriteFast(1,LOW);
+    digitalWriteFast(2,HIGH);
+    digitalWriteFast(3,HIGH);
+    digitalWriteFast(4,HIGH);
+    digitalWriteFast(5,HIGH);
+    digitalWriteFast(6,LOW);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-23");
+    digitalWriteFast(1,LOW);
+    digitalWriteFast(2,HIGH);
+    digitalWriteFast(3,LOW);
+    digitalWriteFast(4,LOW);
+    digitalWriteFast(5,LOW);
+    digitalWriteFast(6,HIGH);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-24");
+    digitalWriteFast(1,LOW);
+    digitalWriteFast(2,HIGH);
+    digitalWriteFast(3,HIGH);
+    digitalWriteFast(4,LOW);
+    digitalWriteFast(5,LOW);
+    digitalWriteFast(6,HIGH);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-25");
+    digitalWriteFast(1,LOW);
+    digitalWriteFast(2,HIGH);
+    digitalWriteFast(3,LOW);
+    digitalWriteFast(4,HIGH);
+    digitalWriteFast(5,LOW);
+    digitalWriteFast(6,HIGH);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-26");
+    digitalWriteFast(1,LOW);
+    digitalWriteFast(2,HIGH);
+    digitalWriteFast(3,HIGH);
+    digitalWriteFast(4,HIGH);
+    digitalWriteFast(5,LOW);
+    digitalWriteFast(6,HIGH);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-27");
+    digitalWriteFast(1,LOW);
+    digitalWriteFast(2,HIGH);
+    digitalWriteFast(3,LOW);
+    digitalWriteFast(4,LOW);
+    digitalWriteFast(5,HIGH);
+    digitalWriteFast(6,HIGH);
+    digitalWriteFast(16,HIGH);
+    delay(wait1);
+    digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
+    delay(wait3);
+
+    //Serial.println("W-Deactivate");
+    digitalWriteFast(1,LOW);
+    digitalWriteFast(2,LOW);
+    digitalWriteFast(3,LOW);
+    digitalWriteFast(4,LOW);
+    digitalWriteFast(5,LOW);
+    digitalWriteFast(6,LOW);
+    digitalWriteFast(16,LOW);
+    digitalWriteFast(15,LOW);
+
+    delay(wait4);
+
+    // Begin Device Set -- Bits second
+
+    //Serial.println("B-1");
+    digitalWriteFast(7,HIGH);
+    digitalWriteFast(8,LOW);
+    digitalWriteFast(9,LOW);
+    digitalWriteFast(10,LOW);
+    digitalWriteFast(11,LOW);
+    digitalWriteFast(12,LOW);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-2");
+    digitalWriteFast(7,HIGH);
+    digitalWriteFast(8,LOW);
+    digitalWriteFast(9,HIGH);
+    digitalWriteFast(10,LOW);
+    digitalWriteFast(11,LOW);
+    digitalWriteFast(12,LOW);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-3");
+    digitalWriteFast(7,HIGH);
+    digitalWriteFast(8,LOW);
+    digitalWriteFast(9,LOW);
+    digitalWriteFast(10,HIGH);
+    digitalWriteFast(11,LOW);
+    digitalWriteFast(12,LOW);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-4");
+    digitalWriteFast(7,HIGH);
+    digitalWriteFast(8,LOW);
+    digitalWriteFast(9,HIGH);
+    digitalWriteFast(10,HIGH);
+    digitalWriteFast(11,LOW);
+    digitalWriteFast(12,LOW);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-5");
+    digitalWriteFast(7,HIGH);
+    digitalWriteFast(8,LOW);
+    digitalWriteFast(9,LOW);
+    digitalWriteFast(10,LOW);
+    digitalWriteFast(11,HIGH);
+    digitalWriteFast(12,LOW);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-6");
+    digitalWriteFast(7,HIGH);
+    digitalWriteFast(8,LOW);
+    digitalWriteFast(9,HIGH);
+    digitalWriteFast(10,LOW);
+    digitalWriteFast(11,HIGH);
+    digitalWriteFast(12,LOW);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-7");
+    digitalWriteFast(7,HIGH);
+    digitalWriteFast(8,LOW);
+    digitalWriteFast(9,LOW);
+    digitalWriteFast(10,HIGH);
+    digitalWriteFast(11,HIGH);
+    digitalWriteFast(12,LOW);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-8");
+    digitalWriteFast(7,HIGH);
+    digitalWriteFast(8,LOW);
+    digitalWriteFast(9,HIGH);
+    digitalWriteFast(10,HIGH);
+    digitalWriteFast(11,HIGH);
+    digitalWriteFast(12,LOW);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-9");
+    digitalWriteFast(7,HIGH);
+    digitalWriteFast(8,LOW);
+    digitalWriteFast(9,LOW);
+    digitalWriteFast(10,LOW);
+    digitalWriteFast(11,LOW);
+    digitalWriteFast(12,HIGH);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-10");
+    digitalWriteFast(7,HIGH);
+    digitalWriteFast(8,LOW);
+    digitalWriteFast(9,HIGH);
+    digitalWriteFast(10,LOW);
+    digitalWriteFast(11,LOW);
+    digitalWriteFast(12,HIGH);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-11");
+    digitalWriteFast(7,HIGH);
+    digitalWriteFast(8,LOW);
+    digitalWriteFast(9,LOW);
+    digitalWriteFast(10,HIGH);
+    digitalWriteFast(11,LOW);
+    digitalWriteFast(12,HIGH);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-12");
+    digitalWriteFast(7,HIGH);
+    digitalWriteFast(8,LOW);
+    digitalWriteFast(9,HIGH);
+    digitalWriteFast(10,HIGH);
+    digitalWriteFast(11,LOW);
+    digitalWriteFast(12,HIGH);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-13");
+    digitalWriteFast(7,HIGH);
+    digitalWriteFast(8,LOW);
+    digitalWriteFast(9,LOW);
+    digitalWriteFast(10,LOW);
+    digitalWriteFast(11,HIGH);
+    digitalWriteFast(12,HIGH);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-14");
+    digitalWriteFast(7,HIGH);
+    digitalWriteFast(8,LOW);
+    digitalWriteFast(9,HIGH);
+    digitalWriteFast(10,LOW);
+    digitalWriteFast(11,HIGH);
+    digitalWriteFast(12,HIGH);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-15");
+    digitalWriteFast(7,LOW);
+    digitalWriteFast(8,HIGH);
+    digitalWriteFast(9,LOW);
+    digitalWriteFast(10,LOW);
+    digitalWriteFast(11,LOW);
+    digitalWriteFast(12,LOW);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-16");
+    digitalWriteFast(7,LOW);
+    digitalWriteFast(8,HIGH);
+    digitalWriteFast(9,HIGH);
+    digitalWriteFast(10,LOW);
+    digitalWriteFast(11,LOW);
+    digitalWriteFast(12,LOW);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-17");
+    digitalWriteFast(7,LOW);
+    digitalWriteFast(8,HIGH);
+    digitalWriteFast(9,LOW);
+    digitalWriteFast(10,HIGH);
+    digitalWriteFast(11,LOW);
+    digitalWriteFast(12,LOW);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-18");
+    digitalWriteFast(7,LOW);
+    digitalWriteFast(8,HIGH);
+    digitalWriteFast(9,HIGH);
+    digitalWriteFast(10,HIGH);
+    digitalWriteFast(11,LOW);
+    digitalWriteFast(12,LOW);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-19");
+    digitalWriteFast(7,LOW);
+    digitalWriteFast(8,HIGH);
+    digitalWriteFast(9,LOW);
+    digitalWriteFast(10,LOW);
+    digitalWriteFast(11,HIGH);
+    digitalWriteFast(12,LOW);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-20");
+    digitalWriteFast(7,LOW);
+    digitalWriteFast(8,HIGH);
+    digitalWriteFast(9,HIGH);
+    digitalWriteFast(10,LOW);
+    digitalWriteFast(11,HIGH);
+    digitalWriteFast(12,LOW);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-21");
+    digitalWriteFast(7,LOW);
+    digitalWriteFast(8,HIGH);
+    digitalWriteFast(9,LOW);
+    digitalWriteFast(10,HIGH);
+    digitalWriteFast(11,HIGH);
+    digitalWriteFast(12,LOW);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-22");
+    digitalWriteFast(7,LOW);
+    digitalWriteFast(8,HIGH);
+    digitalWriteFast(9,HIGH);
+    digitalWriteFast(10,HIGH);
+    digitalWriteFast(11,HIGH);
+    digitalWriteFast(12,LOW);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-23");
+    digitalWriteFast(7,LOW);
+    digitalWriteFast(8,HIGH);
+    digitalWriteFast(9,LOW);
+    digitalWriteFast(10,LOW);
+    digitalWriteFast(11,LOW);
+    digitalWriteFast(12,HIGH);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-24");
+    digitalWriteFast(7,LOW);
+    digitalWriteFast(8,HIGH);
+    digitalWriteFast(9,HIGH);
+    digitalWriteFast(10,LOW);
+    digitalWriteFast(11,LOW);
+    digitalWriteFast(12,HIGH);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-25");
+    digitalWriteFast(7,LOW);
+    digitalWriteFast(8,HIGH);
+    digitalWriteFast(9,LOW);
+    digitalWriteFast(10,HIGH);
+    digitalWriteFast(11,LOW);
+    digitalWriteFast(12,HIGH);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-26");
+    digitalWriteFast(7,LOW);
+    digitalWriteFast(8,HIGH);
+    digitalWriteFast(9,HIGH);
+    digitalWriteFast(10,HIGH);
+    digitalWriteFast(11,LOW);
+    digitalWriteFast(12,HIGH);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-27");
+    digitalWriteFast(7,LOW);
+    digitalWriteFast(8,HIGH);
+    digitalWriteFast(9,LOW);
+    digitalWriteFast(10,LOW);
+    digitalWriteFast(11,HIGH);
+    digitalWriteFast(12,HIGH);
+    digitalWriteFast(18,HIGH);
+    delay(wait1);
+    digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
+    delay(wait3);
+
+    //Serial.println("B-Deactivate");
+    digitalWriteFast(7,LOW);
+    digitalWriteFast(8,LOW);
+    digitalWriteFast(9,LOW);
+    digitalWriteFast(10,LOW);
+    digitalWriteFast(11,LOW);
+    digitalWriteFast(12,LOW);
+    digitalWriteFast(18,LOW);
+    digitalWriteFast(17,LOW);
 
     counter++;
-    delay(3000); // wait 3 seconds between sets
+    delay(wait4); // wait between repeats of the set
 
     if (counter >= count){
       hasRun = true;

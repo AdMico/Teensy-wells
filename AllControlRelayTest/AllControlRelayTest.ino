@@ -21,10 +21,11 @@
 // V1-NonInv = 29; V1-Inv (def) = 30; V2-NonInv = 31; V2-Inv (def) = 32; I1-Hi = 33; I1-Lo (def) = 34; I2-Hi = 35; I2-Lo (def) = 36;
 // I1-CSA = 37; I1-TIA (def) = 38; I2-CSA = 39; I2-TIA (def) = 40.
 
-int count = 3; // Number of times to switch the relay set
+int count = 1; // Number of times to switch the relay set
 int counter = 0;
-int wait1 = 1000; // time in microseconds
-int wait2 = 50000; // time in microseconds
+int wait1 = 2; // Time relay coil is active
+int wait2 = 500; // Time between on and off
+int wait3 = 500; // Time before the next relay
 bool hasRun = false;
 
 void setup() {
@@ -61,155 +62,143 @@ void loop() {
 
     // Make sure the 5V power line is active, otherwise the other relays won't switch.
     //Serial.println("+5V Active");
-    //digitalWriteFast(20,HIGH);
-    //delayMicroseconds(wait1);
-    //digitalWriteFast(20,LOW);
-    //delayMicroseconds(wait2);
+    digitalWriteFast(20,HIGH);
+    delay(wait1);
+    digitalWriteFast(20,LOW);
+    delay(wait3);
 
     //Serial.println("Bias Bits");
     digitalWriteFast(14,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(14,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("Bias Words (def)");
     digitalWriteFast(13,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(13,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     // Run these two reversed to ensure that all following relay tests run
     //Serial.println("+5V GND (def)");
     digitalWriteFast(19,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(19,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("+5V Active");
     digitalWriteFast(20,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(20,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("Source Ext");
     digitalWriteFast(22,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(22,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("Source Int (def)");
     digitalWriteFast(21,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(21,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("Drain Ext");
     digitalWriteFast(24,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(24,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("Drain Int (def)");
     digitalWriteFast(23,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(23,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("Hold Ext");
     digitalWriteFast(26,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(26,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("Hold Int (def)");
     digitalWriteFast(25,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(25,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("Gate Ext");
     digitalWriteFast(28,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(28,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("Gate Int (def)");
     digitalWriteFast(27,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(27,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("V1-NonInv");
     digitalWriteFast(30,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(30,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("V1-Inv (def)");
     digitalWriteFast(29,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(29,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("V2-NonInv");
     digitalWriteFast(32,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(32,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("V2-Inv (def)");
     digitalWriteFast(31,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(31,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("I1-Hi");
     digitalWriteFast(34,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(34,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("I1-Lo (def)");
     digitalWriteFast(33,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(33,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("I2-Hi");
     digitalWriteFast(36,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(36,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("I2-Lo (def)");
     digitalWriteFast(35,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(35,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("I1-CSA");
     digitalWriteFast(38,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(38,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("I1-TIA (def)");
     digitalWriteFast(37,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(37,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     //Serial.println("I2-CSA");
     digitalWriteFast(40,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(40,LOW);
-    delayMicroseconds(wait2);
-
+    delay(wait2);
     //Serial.println("I2-TIA (def)");
     digitalWriteFast(39,HIGH);
-    delayMicroseconds(wait1);
+    delay(wait1);
     digitalWriteFast(39,LOW);
-    delayMicroseconds(wait2);
+    delay(wait3);
 
     counter++;
     delay(3000); // wait 3 seconds between sets

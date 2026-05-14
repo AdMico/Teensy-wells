@@ -3,7 +3,7 @@
 //
 // @developers: Adam Micolich
 //
-// Basic algorithm for testing all 54 device relays.
+// Basic algorithm for testing all 27 Bit relays only.
 // It will cycle through bringing each relay one by one first to active, then back to hold (default)
 // Has no interaction with PyNE-wells code, it's purely for hardware test, and should be used with the Teensy in the MuxBox PCB.
 //
@@ -57,10 +57,10 @@ void loop() {
     
     // Make sure the 5V power line is active, otherwise the other relays won't switch.
     //Serial.println("+5V Active");
-    //digitalWriteFast(20,HIGH);
-    //delay(wait1);
-    //digitalWriteFast(20,LOW);
-    //delay(wait3);
+    digitalWriteFast(20,HIGH);
+    delay(wait1);
+    digitalWriteFast(20,LOW);
+    delay(wait3);
 
     //Serial.println("B-1");
     digitalWriteFast(7,HIGH);
