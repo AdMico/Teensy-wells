@@ -21,11 +21,11 @@
 // V1-NonInv = 29; V1-Inv (def) = 30; V2-NonInv = 31; V2-Inv (def) = 32; I1-Hi = 33; I1-Lo (def) = 34; I2-Hi = 35; I2-Lo (def) = 36;
 // I1-CSA = 37; I1-TIA (def) = 38; I2-CSA = 39; I2-TIA (def) = 40.
 
-int wait1 = 2; // Time relay coil is active
-int wait2 = 100; // Time between on and off
-int wait3 = 1000; // Time before the next relay
 int count = 5; // Number of times to switch the relay
 int counter = 0;
+int wait1 = 2; // Time relay coil is active
+int wait2 = 100; // Time between on and off
+int wait3 = 500; // Time before the next relay
 bool hasRun = false;
 
 void setup() {

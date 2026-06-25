@@ -3,9 +3,11 @@
 //
 // @developers: Adam Micolich
 //
-// Basic algorithm for testing all 14 control relays.
+// Basic algorithm for testing all 16 control relays.
 // It will cycle through bringing each relay one by one first to NO, then back to NC (default)
 // Has no interaction with PyNE-wells code, it's purely for hardware test, and should be used with the Teensy in the MuxBox PCB.
+//
+// Note: You will only hear 12 relay rollovers because one GPIO pair has six relays on it rather than only two.
 //
 // APM 08MAY26 -- Need to fix GPIO map in future instance when I fix the BC847 issue on the MuxBox PCB.
 
@@ -24,7 +26,7 @@
 int count = 1; // Number of times to switch the relay set
 int counter = 0;
 int wait1 = 2; // Time relay coil is active
-int wait2 = 500; // Time between on and off
+int wait2 = 100; // Time between on and off
 int wait3 = 500; // Time before the next relay
 bool hasRun = false;
 

@@ -23,9 +23,9 @@
 
 int count = 1; // Number of times to switch the relay set
 int counter = 0;
-int wait1 = 100; // Time relay coil is active
+int wait1 = 2; // Time relay coil is active
 int wait2 = 100; // Time between on and off
-int wait3 = 1000; // Time before the next relay
+int wait3 = 500; // Time before the next relay
 bool hasRun = false;
 
 void setup() {

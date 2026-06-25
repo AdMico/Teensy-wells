@@ -3,15 +3,15 @@
 //
 // @developers: Adam Micolich
 //
-// Basic algorithm for switching off +5V power to Muxbox PCB.
-// It will flip the K-P relay to NC then stop.
+// Basic algorithm for switching on +5V power to Muxbox PCB.
+// It will flip the K-P relay to NO then stop.
 // Has no interaction with PyNE-wells code, it's purely for hardware test, and should be used with the Teensy in the MuxBox.
 //
 // APM 08MAY26 -- Need to fix GPIO map in future instance when I fix the BC847 issue on the MuxBox PCB.
 
-int led1Pin = 19; // +5V GND
+int led1Pin = 20; // +5V Active
 
-int wait1 = 2; // set to 2ms to guarantee operation
+int wait1 = 2; // set to 2ms to guarantee operation.
 bool hasRun = false;
 
 void setup() {
@@ -21,9 +21,9 @@ void setup() {
 
 void loop() {
   if (!hasRun)  {
-    digitalWrite(led1Pin,HIGH);
+    digitalWriteFast(led1Pin,HIGH);
     delay(wait1);
-    digitalWrite(led1Pin,LOW);
+    digitalWriteFast(led1Pin,LOW);
 
     hasRun = true;
   }
