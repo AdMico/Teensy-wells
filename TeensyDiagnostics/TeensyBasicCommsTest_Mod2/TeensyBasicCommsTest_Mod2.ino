@@ -19,16 +19,26 @@ void loop() {
     val.trim();
     if (val.length() > 0) {
       char firstChar = val.charAt(0);
-      String val2 = val.remove(0,1);
-      if (firstChar == 'A') { // Condition A: Echo back the exact string unmodified
-        Serial.println(val2);
+      if (firstChar == 'A') { // Condition A: Activate control relay
+        String relay = val.substring(1,3);
+        Serial.println("Activate: " + relay);
       } 
-      else if (firstChar == 'B') { // Condition B: Reverse the string and send it back
-        String val3 = reverse(val2);
-        Serial.println(val3);
+      else if (firstChar == 'B') { // Condition B: Deactivate control relay
+        String relay = val.substring(1,3);
+        Serial.println("Deactivate: " + relay);
       } 
-      else { // Condition C: Invalid prefix, return an error message
-        Serial.println("Error: String must start with 'A' or 'B'.");
+      else if (firstChar == 'M') { // Condition C: Node to measure
+        String word = val.charAt(1);
+        String bit = val.charAt(2);
+        Serial.println("Measure: " + word + " " + bit);
+      }
+      else if (firstChar == 'H') { // Condition D: Node to hold
+        String word = val.charAt(1);
+        String bit = val.charAt(2);
+        Serial.println("Hold: " + word + " " + bit);
+      }
+      else { // Condition E: Invalid prefix, return an error message
+        Serial.println("Error: String must start with A, B, M or H.");
       }
     }
   }
