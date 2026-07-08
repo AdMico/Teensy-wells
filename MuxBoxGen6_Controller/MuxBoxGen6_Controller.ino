@@ -23,7 +23,35 @@
 // I1-CSA = 37; I1-TIA (def) = 38; I2-CSA = 39; I2-TIA (def) = 40.
 
   int wait1 = 2; // Time relay coil is active
-  int wait2 = 
+  uint8_t muxTable[27][6] = { // Columns are EN1, EN2, A0, A1, A2, A3
+    {1,0,0,0,0,0}, // Line 1
+    {1,0,1,0,0,0}, // Line 2
+    {1,0,0,1,0,0}, // Line 3
+    {1,0,1,1,0,0}, // Line 4
+    {1,0,0,0,1,0}, // Line 5
+    {1,0,1,0,1,0}, // Line 6
+    {1,0,0,1,1,0}, // Line 7
+    {1,0,1,1,1,0}, // Line 8
+    {1,0,0,0,0,1}, // Line 9
+    {1,0,1,0,0,1}, // Line 10
+    {1,0,0,1,0,1}, // Line 11
+    {1,0,1,1,0,1}, // Line 12
+    {1,0,0,0,1,1}, // Line 13
+    {1,0,1,0,1,1}, // Line 14
+    {0,1,0,0,0,0}, // Line 15
+    {0,1,1,0,0,0}, // Line 16
+    {0,1,0,1,0,0}, // Line 17
+    {0,1,1,1,0,0}, // Line 18
+    {0,1,0,0,1,0}, // Line 19
+    {0,1,1,0,1,0}, // Line 20
+    {0,1,0,1,1,0}, // Line 21
+    {0,1,1,1,1,0}, // Line 22
+    {0,1,0,0,0,1}, // Line 23
+    {0,1,1,0,0,1}, // Line 24
+    {0,1,0,1,0,1}, // Line 25
+    {0,1,1,1,0,1}, // Line 26
+    {0,1,0,0,1,1}, // Line 27
+  };
 
 void setup() {
   // Initialize the digital pins as outputs
@@ -71,69 +99,69 @@ void setup() {
   pinMode(40,OUTPUT); // I2-CSA
 
   // Set all control bits to OFF
-  digitalWriteFast(1,LOW);
-  digitalWriteFast(2,LOW);
-  digitalWriteFast(3,LOW);
-  digitalWriteFast(4,LOW);
-  digitalWriteFast(5,LOW);
-  digitalWriteFast(6,LOW);
-  digitalWriteFast(7,LOW);
-  digitalWriteFast(8,LOW);
-  digitalWriteFast(9,LOW);
-  digitalWriteFast(10,LOW);
-  digitalWriteFast(11,LOW);
-  digitalWriteFast(12,LOW);
-  digitalWriteFast(15,LOW);
-  digitalWriteFast(16,LOW);
-  digitalWriteFast(17,LOW);
-  digitalWriteFast(18,LOW);
+  digitalWriteFast(1,0);
+  digitalWriteFast(2,0);
+  digitalWriteFast(3,0);
+  digitalWriteFast(4,0);
+  digitalWriteFast(5,0);
+  digitalWriteFast(6,0);
+  digitalWriteFast(7,0);
+  digitalWriteFast(8,0);
+  digitalWriteFast(9,0);
+  digitalWriteFast(10,0);
+  digitalWriteFast(11,0);
+  digitalWriteFast(12,0);
+  digitalWriteFast(15,0);
+  digitalWriteFast(16,0);
+  digitalWriteFast(17,0);
+  digitalWriteFast(18,0);
 
   // Make sure the 5V power line is active, otherwise the other relays won't switch.
-  digitalWriteFast(20,HIGH);
+  digitalWriteFast(20,1);
   delay(wait1);
-  digitalWriteFast(20,LOW);
+  digitalWriteFast(20,0);
 
   // Ensure the control relays are set to defaults
   // Set Source Int (def)
-  digitalWriteFast(21,HIGH);
+  digitalWriteFast(21,1);
   delay(wait1);
-  digitalWriteFast(21,LOW);
+  digitalWriteFast(21,0);
   // Set Drain Int (def)
-  digitalWriteFast(23,HIGH);
+  digitalWriteFast(23,1);
   delay(wait1);
-  digitalWriteFast(23,LOW);
+  digitalWriteFast(23,0);
   // Set Hold Int (def)
-  digitalWriteFast(25,HIGH);
+  digitalWriteFast(25,1);
   delay(wait1);
-  digitalWriteFast(25,LOW);
+  digitalWriteFast(25,0);
   // Set Gate Int (def)
-  digitalWriteFast(27,HIGH);
+  digitalWriteFast(27,1);
   delay(wait1);
-  digitalWriteFast(27,LOW);
+  digitalWriteFast(27,0);
   // Set V1-Inv (def)
-  digitalWriteFast(29,HIGH);
+  digitalWriteFast(29,1);
   delay(wait1);
-  digitalWriteFast(29,LOW);
+  digitalWriteFast(29,0);
   // Set V2-Inv (def)
-  digitalWriteFast(31,HIGH);
+  digitalWriteFast(31,1);
   delay(wait1);
-  digitalWriteFast(31,LOW);
+  digitalWriteFast(31,0);
   // Set I1-Lo (def)
-  digitalWriteFast(33,HIGH);
+  digitalWriteFast(33,1);
   delay(wait1);
-  digitalWriteFast(33,LOW);
+  digitalWriteFast(33,0);
   // Set I2-Lo (def)
-  digitalWriteFast(35,HIGH);
+  digitalWriteFast(35,1);
   delay(wait1);
-  digitalWriteFast(35,LOW);
+  digitalWriteFast(35,0);
   // Set I1-TIA (def)
-  digitalWriteFast(37,HIGH);
+  digitalWriteFast(37,1);
   delay(wait1);
-  digitalWriteFast(37,LOW);
+  digitalWriteFast(37,0);
   // Set I2-TIA (def)
-  digitalWriteFast(39,HIGH);
+  digitalWriteFast(39,1);
   delay(wait1);
-  digitalWriteFast(39,LOW);
+  digitalWriteFast(39,0);
 
   // Prep the serial connection
   Serial.begin(9600);
@@ -141,9 +169,308 @@ void setup() {
 
 void loop() {
   // Wait for a command to arrive then pass to appropriate subroutine
-  String input;
-  while (Serial.available() > 0) {
-    input = input + (char)Serial.read(); // Read data byte by byte and store it
+  if (Serial.available() > 0) {
+    String input = Serial.readStringUntil('\n');
+    input.trim();
+    if (input.length() > 0) {
+      if (input.length() == 3) {
+        char firstChar = input.charAt(0);
+        if (firstChar == 'A') { // Set control relay back to default
+          CmdA(input);
+        }
+        else if (firstChar == 'B') { // Set control relay to non-default
+          CmdB(input);
+        }
+        else if (firstChar == 'M') { // Node to measure
+          NodeM(input);
+        }
+        else if (firstChar == 'H') { // Node to hold
+          NodeH(input);
+        }
+        else { // Invalid prefix so send error
+          Error1();
+        }
+      }
+      else { // Invalid command so send error
+        Error2();   
+      } 
+    }
   }
+}
 
+void CmdA(String input) {
+  String relay = input.substring(1,3);
+  int relNum = relay.toInt();
+  if (relNum >= 1 && relNum <= 6) {
+    if (relNum >= 1 && relNum <= 3) {
+      if (relNum == 1) {
+        digitalWriteFast(13,1);
+        delay(wait1);
+        digitalWriteFast(13,0);
+        Error0();
+      }
+      else if (relNum == 2) {
+        digitalWriteFast(19,1);
+        delay(wait1);
+        digitalWriteFast(19,0);
+        Error0();
+      }
+      else {
+        digitalWriteFast(21,1);
+        delay(wait1);
+        digitalWriteFast(21,0);
+        Error0();
+      }
+    }
+    else {
+      if (relNum == 4) {
+        digitalWriteFast(23,1);
+        delay(wait1);
+        digitalWriteFast(23,0);
+        Error0();
+      }
+      else if (relNum == 5) {
+        digitalWriteFast(25,1);
+        delay(wait1);
+        digitalWriteFast(25,0);
+        Error0();
+      }
+      else {
+        digitalWriteFast(27,1);
+        delay(wait1);
+        digitalWriteFast(27,0);
+        Error0();
+      }
+    }
+  } 
+  else if (relNum >= 7 && relNum <= 12) {
+    if (relNum >= 7 && relNum <= 9) {
+      if (relNum == 7) {
+        digitalWriteFast(29,1);
+        delay(wait1);
+        digitalWriteFast(29,0);
+        Error0();
+      }
+      else if (relNum == 8) {
+        digitalWriteFast(31,1);
+        delay(wait1);
+        digitalWriteFast(31,0);
+        Error0();
+      }
+      else {
+        digitalWriteFast(33,1);
+        delay(wait1);
+        digitalWriteFast(33,0);
+        Error0();
+      }
+    }
+    else {
+      if (relNum == 10) {
+        digitalWriteFast(35,1);
+        delay(wait1);
+        digitalWriteFast(35,0);
+        Error0();
+      }
+      else if (relNum == 11) {
+        digitalWriteFast(37,1);
+        delay(wait1);
+        digitalWriteFast(37,0);
+        Error0();
+      }
+      else {
+        digitalWriteFast(39,1);
+        delay(wait1);
+        digitalWriteFast(39,0);
+        Error0();
+      }
+    }
+  } 
+  else {
+    Error3();
+  }
+}
+
+void CmdB(String input) {
+  String relay = input.substring(1,3);
+  int relNum = relay.toInt();
+  if (relNum >= 1 && relNum <= 6) {
+    if (relNum >= 1 && relNum <= 3) {
+      if (relNum == 1) {
+        digitalWriteFast(14,1);
+        delay(wait1);
+        digitalWriteFast(14,0);
+        Error0();
+      }
+      else if (relNum == 2) {
+        digitalWriteFast(20,1);
+        delay(wait1);
+        digitalWriteFast(20,0);
+        Error0();
+      }
+      else {
+        digitalWriteFast(22,1);
+        delay(wait1);
+        digitalWriteFast(22,0);
+        Error0();
+      }
+    }
+    else {
+      if (relNum == 4) {
+        digitalWriteFast(24,1);
+        delay(wait1);
+        digitalWriteFast(24,0);
+        Error0();
+      }
+      else if (relNum == 5) {
+        digitalWriteFast(26,1);
+        delay(wait1);
+        digitalWriteFast(26,0);
+        Error0();
+      }
+      else {
+        digitalWriteFast(28,1);
+        delay(wait1);
+        digitalWriteFast(28,0);
+        Error0();
+      }
+    }
+  } 
+  else if (relNum >= 7 && relNum <= 12) {
+    if (relNum >= 7 && relNum <= 9) {
+      if (relNum == 7) {
+        digitalWriteFast(30,1);
+        delay(wait1);
+        digitalWriteFast(30,0);
+        Error0();
+      }
+      else if (relNum == 8) {
+        digitalWriteFast(32,1);
+        delay(wait1);
+        digitalWriteFast(32,0);
+        Error0();
+      }
+      else {
+        digitalWriteFast(34,1);
+        delay(wait1);
+        digitalWriteFast(34,0);
+        Error0();
+      }
+    }
+    else {
+      if (relNum == 10) {
+        digitalWriteFast(36,1);
+        delay(wait1);
+        digitalWriteFast(36,0);
+        Error0();
+      }
+      else if (relNum == 11) {
+        digitalWriteFast(38,1);
+        delay(wait1);
+        digitalWriteFast(38,0);
+        Error0();
+      }
+      else {
+        digitalWriteFast(40,1);
+        delay(wait1);
+        digitalWriteFast(40,0);
+        Error0();
+      }
+    }
+  } 
+  else {
+    Error3();
+  }
+}
+
+void NodeM(String input) {
+  char word = input.charAt(1);
+  char bit = input.charAt(2);
+  int wNum = word;
+  int bNum = bit;
+  // Convert word and bit into the corresponding line numbers
+  if (word == '&') {
+    wNum = wNum - 11;
+  } else {
+    wNum = wNum - 64;
+  }
+  if (bit == '&') {
+    bNum = bNum - 11;
+  } else {
+    bNum = bNum - 64;
+  } 
+  // Switch the word line over to measure
+  digitalWriteFast(1,muxTable[wNum][0]);
+  digitalWriteFast(2,muxTable[wNum][1]);
+  digitalWriteFast(3,muxTable[wNum][2]);
+  digitalWriteFast(4,muxTable[wNum][3]);
+  digitalWriteFast(5,muxTable[wNum][4]);
+  digitalWriteFast(6,muxTable[wNum][5]);
+  digitalWriteFast(16,1);
+  delay(wait1);
+  digitalWriteFast(16,0);
+  // Switch the bit line over to measure
+  digitalWriteFast(7,muxTable[bNum][0]);
+  digitalWriteFast(8,muxTable[bNum][1]);
+  digitalWriteFast(9,muxTable[bNum][2]);
+  digitalWriteFast(10,muxTable[bNum][3]);
+  digitalWriteFast(11,muxTable[bNum][4]);
+  digitalWriteFast(12,muxTable[bNum][5]);
+  digitalWriteFast(18,1);
+  delay(wait1);
+  digitalWriteFast(18,0);
+  Error0();
+}
+
+void NodeH(String input) {
+  char word = input.charAt(1);
+  char bit = input.charAt(2);
+  int wNum = word;
+  int bNum = bit;
+  if (word == '&') {
+    wNum = wNum - 11;
+  } else {
+    wNum = wNum - 64;
+  }
+  if (bit == '&') {
+    bNum = bNum - 11;
+  } else {
+    bNum = bNum - 64;
+  } 
+  // Switch the word line over to measure
+  digitalWriteFast(1,muxTable[wNum][0]);
+  digitalWriteFast(2,muxTable[wNum][1]);
+  digitalWriteFast(3,muxTable[wNum][2]);
+  digitalWriteFast(4,muxTable[wNum][3]);
+  digitalWriteFast(5,muxTable[wNum][4]);
+  digitalWriteFast(6,muxTable[wNum][5]);
+  digitalWriteFast(15,1);
+  delay(wait1);
+  digitalWriteFast(15,0);
+  // Switch the bit line over to measure
+  digitalWriteFast(7,muxTable[bNum][0]);
+  digitalWriteFast(8,muxTable[bNum][1]);
+  digitalWriteFast(9,muxTable[bNum][2]);
+  digitalWriteFast(10,muxTable[bNum][3]);
+  digitalWriteFast(11,muxTable[bNum][4]);
+  digitalWriteFast(12,muxTable[bNum][5]);
+  digitalWriteFast(17,1);
+  delay(wait1);
+  digitalWriteFast(17,0);
+  Error0();
+}
+
+void Error0() { // Process ok
+  Serial.println("Error 0: OK");
+}
+
+void Error1() { // Invalid prefix handler
+  Serial.println("Error 1: Invalid prefix");
+}
+
+void Error2() { // Invalid command handler
+  Serial.println("Error 2: Invalid command");
+}
+
+void Error3() { // Relay out of range handler
+  Serial.println("Error 3: Relay out of range");
 }
