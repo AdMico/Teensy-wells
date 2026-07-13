@@ -389,14 +389,14 @@ void NodeM(String input) {
   int bNum = bit;
   // Convert word and bit into the corresponding line numbers
   if (word == '&') {
-    wNum = wNum - 11;
+    wNum = wNum - 12; // Associates & with muxtable row 27 (i.e., 26) 
   } else {
-    wNum = wNum - 64;
+    wNum = wNum - 65; // Associates A through Z with muxtable row 1 through 26 (i.e., 0 to 25)
   }
   if (bit == '&') {
-    bNum = bNum - 11;
+    bNum = bNum - 12; // Associates & with muxtable row 27 (i.e., 26)
   } else {
-    bNum = bNum - 64;
+    bNum = bNum - 65; // Associates A through Z with muxtable row 1 through 26 (i.e., 0 to 25)
   } 
   // Switch the word line over to measure
   digitalWriteFast(1,muxTable[wNum][0]);
@@ -427,14 +427,14 @@ void NodeH(String input) {
   int wNum = word;
   int bNum = bit;
   if (word == '&') {
-    wNum = wNum - 11;
+    wNum = wNum - 12; // Associates & with muxtable row 27 (i.e., 26)
   } else {
-    wNum = wNum - 64;
+    wNum = wNum - 65; // Associates A through Z with muxtable row 1 through 26 (i.e., 0 to 25)
   }
   if (bit == '&') {
-    bNum = bNum - 11;
+    bNum = bNum - 12; // Associates & with muxtable row 27 (i.e., 26)
   } else {
-    bNum = bNum - 64;
+    bNum = bNum - 65; // Associates A through Z with muxtable row 1 through 26 (i.e., 0 to 25)
   } 
   // Switch the word line over to measure
   digitalWriteFast(1,muxTable[wNum][0]);
