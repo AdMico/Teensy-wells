@@ -10,19 +10,19 @@
 
 // GPIO Mapping for V1 of Gen6 box
 // W-EN1 = 1; W-EN2 = 2; W-A0 = 3; W-A1 = 4; W-A2 = 5; W-A3 = 6; B-EN1 = 7; B-EN2 = 8; B-A0 = 9; B-A1 = 10; B-A2 = 11; B-A3 = 12;
-// Bias Words (def) = 13; Bias Bits = 14; Word Off (def) = 15; Word On = 16; Bit Off (def) = 17; Bit On = 18; +5V GND (def) = 19; +5V Active = 20;
+// Bias Words (def) = 13; Bias Bits = 14; Word On (def) = 15; Word Off = 16; Bit On (def) = 17; Bit Off = 18; +5V GND (def) = 19; +5V Active = 20;
 // Source Int (def) = 21; Source Ext = 22; Drain Int (def) = 23; Drain Ext = 24; Hold Int (def) = 25; Hold Ext = 26; Gate Int (def) = 27; Gate Ext = 28;
 // V1-Inv (def) = 29; V1-NonInv = 30; V2-Inv (def) = 31; V2-NonInv = 32; I1-Lo (def) = 33; I1-Hi = 34; I2-Lo (def) = 35; I2-Hi = 36;
 // I1-TIA (def) = 37, I1-CSA = 38, I2-TIA (def) = 39; I2-CSA = 40.
 //
 // GPIO Mapping as designed for Gen6 Box (will end up here on V2 boards)
 // W-EN1 = 1; W-EN2 = 2; W-A0 = 3; W-A1 = 4; W-A2 = 5; W-A3 = 6; B-EN1 = 7; B-EN2 = 8; B-A0 = 9; B-A1 = 10; B-A2 = 11; B-A3 = 12;
-// Bias Bits = 13; Bias Words (def) = 14; Word On = 15; Word Off (def) = 16; Bit On = 17; Bit Off (def) = 18; +5V Active = 19; +5V GND (def) = 20;
+// Bias Bits = 13; Bias Words (def) = 14; Word Off = 15; Word On (def) = 16; Bit Off = 17; Bit On (def) = 18; +5V Active = 19; +5V GND (def) = 20;
 // Source Ext = 21; Source Int (def) = 22; Drain Ext = 23; Drain Int (def) = 24; Hold Ext = 25; Hold Int (def) = 26; Gate Ext = 27; Gate Int (def) = 28;
 // V1-NonInv = 29; V1-Inv (def) = 30; V2-NonInv = 31; V2-Inv (def) = 32; I1-Hi = 33; I1-Lo (def) = 34; I2-Hi = 35; I2-Lo (def) = 36;
 // I1-CSA = 37; I1-TIA (def) = 38; I2-CSA = 39; I2-TIA (def) = 40.
 
-  int wait1 = 2; // Time relay coil is active
+  int wait1 = 2; // Time relay coil is active (ms)
   uint8_t muxTable[27][6] = { // Columns are EN1, EN2, A0, A1, A2, A3
     {1,0,0,0,0,0}, // Line 1
     {1,0,1,0,0,0}, // Line 2
@@ -68,10 +68,10 @@ void setup() {
   pinMode(10,OUTPUT); // B-A1
   pinMode(11,OUTPUT); // B-A2
   pinMode(12,OUTPUT); // B-A3
-  pinMode(15,OUTPUT); // Word Off (def)
-  pinMode(16,OUTPUT); // Word On
-  pinMode(17,OUTPUT); // Bit Off (def)
-  pinMode(18,OUTPUT); // Bit On
+  pinMode(15,OUTPUT); // Word On (def)
+  pinMode(16,OUTPUT); // Word Off
+  pinMode(17,OUTPUT); // Bit On (def)
+  pinMode(18,OUTPUT); // Bit Off
   // Control Set
   pinMode(13,OUTPUT); // Bias Words (def)
   pinMode(14,OUTPUT); // Bias Bits
@@ -162,6 +162,32 @@ void setup() {
   digitalWriteFast(39,1);
   delay(wait1);
   digitalWriteFast(39,0);
+
+  // Ensure the word relays are all set to hold
+  for (int i = 0; i < 27; i++) {
+    digitalWriteFast(1,muxTable[i][0]);
+    digitalWriteFast(2,muxTable[i][1]);
+    digitalWriteFast(3,muxTable[i][2]);
+    digitalWriteFast(4,muxTable[i][3]);
+    digitalWriteFast(5,muxTable[i][4]);
+    digitalWriteFast(6,muxTable[i][5]);
+    digitalWriteFast(16,1);
+    delay(wait1);
+    digitalWriteFast(16,0);
+  }
+
+  // Ensure the bit relays are all set to hold
+  for (int j = 0; j < 27; j++) {
+    digitalWriteFast(7,muxTable[j][0]);
+    digitalWriteFast(8,muxTable[j][1]);
+    digitalWriteFast(9,muxTable[j][2]);
+    digitalWriteFast(10,muxTable[j][3]);
+    digitalWriteFast(11,muxTable[j][4]);
+    digitalWriteFast(12,muxTable[j][5]);
+    digitalWriteFast(18,1);
+    delay(wait1);
+    digitalWriteFast(18,0);
+  }
 
   // Prep the serial connection
   Serial.begin(9600);
@@ -382,7 +408,7 @@ void CmdB(String input) {
   }
 }
 
-void NodeM(String input) {
+void NodeM(String input) { // Set specified node to measure
   char word = input.charAt(1);
   char bit = input.charAt(2);
   int wNum = word;
@@ -390,44 +416,6 @@ void NodeM(String input) {
   // Convert word and bit into the corresponding line numbers
   if (word == '&') {
     wNum = wNum - 12; // Associates & with muxtable row 27 (i.e., 26) 
-  } else {
-    wNum = wNum - 65; // Associates A through Z with muxtable row 1 through 26 (i.e., 0 to 25)
-  }
-  if (bit == '&') {
-    bNum = bNum - 12; // Associates & with muxtable row 27 (i.e., 26)
-  } else {
-    bNum = bNum - 65; // Associates A through Z with muxtable row 1 through 26 (i.e., 0 to 25)
-  } 
-  // Switch the word line over to measure
-  digitalWriteFast(1,muxTable[wNum][0]);
-  digitalWriteFast(2,muxTable[wNum][1]);
-  digitalWriteFast(3,muxTable[wNum][2]);
-  digitalWriteFast(4,muxTable[wNum][3]);
-  digitalWriteFast(5,muxTable[wNum][4]);
-  digitalWriteFast(6,muxTable[wNum][5]);
-  digitalWriteFast(16,1);
-  delay(wait1);
-  digitalWriteFast(16,0);
-  // Switch the bit line over to measure
-  digitalWriteFast(7,muxTable[bNum][0]);
-  digitalWriteFast(8,muxTable[bNum][1]);
-  digitalWriteFast(9,muxTable[bNum][2]);
-  digitalWriteFast(10,muxTable[bNum][3]);
-  digitalWriteFast(11,muxTable[bNum][4]);
-  digitalWriteFast(12,muxTable[bNum][5]);
-  digitalWriteFast(18,1);
-  delay(wait1);
-  digitalWriteFast(18,0);
-  Error0();
-}
-
-void NodeH(String input) {
-  char word = input.charAt(1);
-  char bit = input.charAt(2);
-  int wNum = word;
-  int bNum = bit;
-  if (word == '&') {
-    wNum = wNum - 12; // Associates & with muxtable row 27 (i.e., 26)
   } else {
     wNum = wNum - 65; // Associates A through Z with muxtable row 1 through 26 (i.e., 0 to 25)
   }
@@ -456,6 +444,44 @@ void NodeH(String input) {
   digitalWriteFast(17,1);
   delay(wait1);
   digitalWriteFast(17,0);
+  Error0();
+}
+
+void NodeH(String input) { // Set specified node back to hold
+  char word = input.charAt(1);
+  char bit = input.charAt(2);
+  int wNum = word;
+  int bNum = bit;
+  if (word == '&') {
+    wNum = wNum - 12; // Associates & with muxtable row 27 (i.e., 26)
+  } else {
+    wNum = wNum - 65; // Associates A through Z with muxtable row 1 through 26 (i.e., 0 to 25)
+  }
+  if (bit == '&') {
+    bNum = bNum - 12; // Associates & with muxtable row 27 (i.e., 26)
+  } else {
+    bNum = bNum - 65; // Associates A through Z with muxtable row 1 through 26 (i.e., 0 to 25)
+  } 
+  // Switch the word line over to hold
+  digitalWriteFast(1,muxTable[wNum][0]);
+  digitalWriteFast(2,muxTable[wNum][1]);
+  digitalWriteFast(3,muxTable[wNum][2]);
+  digitalWriteFast(4,muxTable[wNum][3]);
+  digitalWriteFast(5,muxTable[wNum][4]);
+  digitalWriteFast(6,muxTable[wNum][5]);
+  digitalWriteFast(16,1);
+  delay(wait1);
+  digitalWriteFast(16,0);
+  // Switch the bit line over to hold
+  digitalWriteFast(7,muxTable[bNum][0]);
+  digitalWriteFast(8,muxTable[bNum][1]);
+  digitalWriteFast(9,muxTable[bNum][2]);
+  digitalWriteFast(10,muxTable[bNum][3]);
+  digitalWriteFast(11,muxTable[bNum][4]);
+  digitalWriteFast(12,muxTable[bNum][5]);
+  digitalWriteFast(18,1);
+  delay(wait1);
+  digitalWriteFast(18,0);
   Error0();
 }
 
