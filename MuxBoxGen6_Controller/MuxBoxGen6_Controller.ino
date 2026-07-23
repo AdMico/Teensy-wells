@@ -223,6 +223,9 @@ void loop() {
         else if (firstChar == 'H') { // Node to hold
           NodeH(input);
         }
+        else if (firstChar == 'R') { // Reset all nodes to hold
+          Reset();
+        }
         else if (firstChar == 'T') { // Run Device Relay Test
           char secondChar = input.charAt(1);
           if (secondChar == 'F') { // Run in Fast Mode
@@ -505,6 +508,10 @@ void NodeH(String input) { // Set specified node back to hold
   delay(wait1);
   digitalWriteFast(18,0);
   Error0();
+}
+
+void Reset() { // Reset all device relays to hold
+  
 }
 
 void DRT(int wait2,int wait3,int wait4) { // Device Relay Test
