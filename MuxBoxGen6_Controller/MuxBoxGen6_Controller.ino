@@ -84,8 +84,8 @@ void setup() {
   pinMode(18,OUTPUT); // Bit Off
 
   // Control Set
-  pinMode(13,OUTPUT); // Bias Words (def)
-  pinMode(14,OUTPUT); // Bias Bits
+  pinMode(13,OUTPUT); // Bias Bits (def)
+  pinMode(14,OUTPUT); // Bias Words
   pinMode(19,OUTPUT); // +5V GND (def)
   pinMode(20,OUTPUT); // +5V Active
   pinMode(21,OUTPUT); // Source Int (def)
@@ -227,8 +227,17 @@ void loop() {
         else if (firstChar == 'H') { // Node to hold
           NodeH(input);
         }
-        else if (firstChar == 'R') { // Reset all nodes to hold
-          Reset(wait2r);
+        else if (firstChar == 'R') { // Run a reset routine
+          char secondChar = input.charAt(1);
+          if (secondChar == 'D') { // Reset all nodes to hold
+            ResetDevices(wait2r);
+          }
+          else if (secondChar == 'C') {
+            ResetControl();
+          }
+          else if (secondChar == 'A') {
+            ResetAll(wait2r);
+          }          
         }
         else if (firstChar == 'T') { // Run Device Relay Test
           char secondChar = input.charAt(1);
@@ -259,9 +268,9 @@ void CmdA(String input) {
   if (relNum >= 1 && relNum <= 6) {
     if (relNum >= 1 && relNum <= 3) {
       if (relNum == 1) {
-        digitalWriteFast(13,1);
+        digitalWriteFast(14,1);
         delay(wait1);
-        digitalWriteFast(13,0);
+        digitalWriteFast(14,0);
         Error0();
       }
       else if (relNum == 2) {
@@ -351,9 +360,9 @@ void CmdB(String input) {
   if (relNum >= 1 && relNum <= 6) {
     if (relNum >= 1 && relNum <= 3) {
       if (relNum == 1) {
-        digitalWriteFast(14,1);
+        digitalWriteFast(13,1);
         delay(wait1);
-        digitalWriteFast(14,0);
+        digitalWriteFast(13,0);
         Error0();
       }
       else if (relNum == 2) {
@@ -514,7 +523,52 @@ void NodeH(String input) { // Set specified node back to hold
   Error0();
 }
 
-void Reset(int wait2) { // Reset all device relays to hold
+void ResetControl() {
+  // Ensure the control relays are set to defaults
+  // Set Source Int (def)
+  digitalWriteFast(21,1);
+  delay(wait1);
+  digitalWriteFast(21,0);
+  // Set Drain Int (def)
+  digitalWriteFast(23,1);
+  delay(wait1);
+  digitalWriteFast(23,0);
+  // Set Hold Int (def)
+  digitalWriteFast(25,1);
+  delay(wait1);
+  digitalWriteFast(25,0);
+  // Set Gate Int (def)
+  digitalWriteFast(27,1);
+  delay(wait1);
+  digitalWriteFast(27,0);
+  // Set V1-Inv (def)
+  digitalWriteFast(29,1);
+  delay(wait1);
+  digitalWriteFast(29,0);
+  // Set V2-Inv (def)
+  digitalWriteFast(31,1);
+  delay(wait1);
+  digitalWriteFast(31,0);
+  // Set I1-Lo (def)
+  digitalWriteFast(33,1);
+  delay(wait1);
+  digitalWriteFast(33,0);
+  // Set I2-Lo (def)
+  digitalWriteFast(35,1);
+  delay(wait1);
+  digitalWriteFast(35,0);
+  // Set I1-TIA (def)
+  digitalWriteFast(37,1);
+  delay(wait1);
+  digitalWriteFast(37,0);
+  // Set I2-TIA (def)
+  digitalWriteFast(39,1);
+  delay(wait1);
+  digitalWriteFast(39,0);
+  Error0();
+}
+
+void ResetDevices(int wait2) { // Reset all device relays to hold
   // Ensure the word relays are all set to hold
   for (int i = 0; i < 27; i++) {
     digitalWriteFast(1,muxTable[i][0]);
@@ -564,6 +618,100 @@ void Reset(int wait2) { // Reset all device relays to hold
   digitalWriteFast(17,0);
   digitalWriteFast(18,0);
   Error0();  
+}
+
+void ResetAll(int wait2) {
+  // Ensure all relays are set to defaults/hold
+  // Set Source Int (def)
+  digitalWriteFast(21,1);
+  delay(wait1);
+  digitalWriteFast(21,0);
+  // Set Drain Int (def)
+  digitalWriteFast(23,1);
+  delay(wait1);
+  digitalWriteFast(23,0);
+  // Set Hold Int (def)
+  digitalWriteFast(25,1);
+  delay(wait1);
+  digitalWriteFast(25,0);
+  // Set Gate Int (def)
+  digitalWriteFast(27,1);
+  delay(wait1);
+  digitalWriteFast(27,0);
+  // Set V1-Inv (def)
+  digitalWriteFast(29,1);
+  delay(wait1);
+  digitalWriteFast(29,0);
+  // Set V2-Inv (def)
+  digitalWriteFast(31,1);
+  delay(wait1);
+  digitalWriteFast(31,0);
+  // Set I1-Lo (def)
+  digitalWriteFast(33,1);
+  delay(wait1);
+  digitalWriteFast(33,0);
+  // Set I2-Lo (def)
+  digitalWriteFast(35,1);
+  delay(wait1);
+  digitalWriteFast(35,0);
+  // Set I1-TIA (def)
+  digitalWriteFast(37,1);
+  delay(wait1);
+  digitalWriteFast(37,0);
+  // Set I2-TIA (def)
+  digitalWriteFast(39,1);
+  delay(wait1);
+  digitalWriteFast(39,0);
+
+  // Ensure the word relays are all set to hold
+  for (int i = 0; i < 27; i++) {
+    digitalWriteFast(1,muxTable[i][0]);
+    digitalWriteFast(2,muxTable[i][1]);
+    digitalWriteFast(3,muxTable[i][2]);
+    digitalWriteFast(4,muxTable[i][3]);
+    digitalWriteFast(5,muxTable[i][4]);
+    digitalWriteFast(6,muxTable[i][5]);
+    digitalWriteFast(16,1);
+    delay(wait1);
+    digitalWriteFast(16,0);
+    delay(wait2);
+  }
+
+  //Serial.println("W-Deactivate");
+  digitalWriteFast(1,0);
+  digitalWriteFast(2,0);
+  digitalWriteFast(3,0);
+  digitalWriteFast(4,0);
+  digitalWriteFast(5,0);
+  digitalWriteFast(6,0);
+  digitalWriteFast(15,0);
+  digitalWriteFast(16,0);
+  delay(wait2);
+
+  // Ensure the bit relays are all set to hold
+  for (int j = 0; j < 27; j++) {
+    digitalWriteFast(7,muxTable[j][0]);
+    digitalWriteFast(8,muxTable[j][1]);
+    digitalWriteFast(9,muxTable[j][2]);
+    digitalWriteFast(10,muxTable[j][3]);
+    digitalWriteFast(11,muxTable[j][4]);
+    digitalWriteFast(12,muxTable[j][5]);
+    digitalWriteFast(18,1);
+    delay(wait1);
+    digitalWriteFast(18,0);
+    delay(wait2);
+  }
+
+  //Serial.println("B-Deactivate");
+  digitalWriteFast(7,0);
+  digitalWriteFast(8,0);
+  digitalWriteFast(9,0);
+  digitalWriteFast(10,0);
+  digitalWriteFast(11,0);
+  digitalWriteFast(12,0);
+  digitalWriteFast(17,0);
+  digitalWriteFast(18,0);
+  Error0();
 }
 
 void DRT(int wait2,int wait3,int wait4) { // Device Relay Test
