@@ -30,6 +30,12 @@
   int wait2s = 100; // Time between on and off (ms)
   int wait3s = 500; // Time before the next relay (ms)
   int wait4s = 2000; // Time between test sets (ms)
+  struct activeNode { // Data for the active node
+    int wAct; // Active word line -- if 0 then none, if 1-27, then corresponding word line. Used for error control.
+    int bAct; // Active bit line -- if 0 then none, if 1-27, then corresponding bit line. Used for error control.
+  };
+    // Initialize activeNode structure
+  activeNode node = {0,0};
 
 
   uint8_t muxTable[27][6] = { // Columns are EN1, EN2, A0, A1, A2, A3
@@ -64,7 +70,6 @@
 
 void setup() {
   // Initialize the digital pins as outputs
-
   // Device Set
   pinMode(1,OUTPUT); // W-EN1
   pinMode(2,OUTPUT); // W-EN2
@@ -82,7 +87,6 @@ void setup() {
   pinMode(16,OUTPUT); // Word Off
   pinMode(17,OUTPUT); // Bit On (def)
   pinMode(18,OUTPUT); // Bit Off
-
   // Control Set
   pinMode(13,OUTPUT); // Bias Bits (def)
   pinMode(14,OUTPUT); // Bias Words
@@ -215,36 +219,42 @@ void loop() {
       }
       else if (input.length() == 3) {
         char firstChar = input.charAt(0);
-        if (firstChar == 'A') { // Set control relay back to default
-          CmdA(input);
+        if (firstChar == 'D') { // Set control relay back to default
+          CmdD(input);
         }
-        else if (firstChar == 'B') { // Set control relay to non-default
-          CmdB(input);
+        else if (firstChar == 'N') { // Set control relay to non-default
+          CmdN(input);
         }
         else if (firstChar == 'M') { // Node to measure
-          NodeM(input);
+          node = NodeM(input,node);
         }
         else if (firstChar == 'H') { // Node to hold
-          NodeH(input);
+          node = NodeH(input,node);
+        }
+        else if (firstChar == 'W') { // Shift measured node along wordline
+          node = ShiftW(input,node);
+        }
+        else if (firstChar == 'B') { // Shift measured node along bitline
+          node = ShiftB(input,node);
         }
         else if (firstChar == 'R') { // Run a reset routine
           char secondChar = input.charAt(1);
           if (secondChar == 'D') { // Reset all nodes to hold
             ResetDevices(wait2r);
           }
-          else if (secondChar == 'C') {
+          else if (secondChar == 'C') { // Reset all control relays to default
             ResetControl();
           }
-          else if (secondChar == 'A') {
+          else if (secondChar == 'A') { // Do both resets sequentially
             ResetAll(wait2r);
           }          
         }
         else if (firstChar == 'T') { // Run Device Relay Test
           char secondChar = input.charAt(1);
-          if (secondChar == 'F') { // Run in Fast Mode
+          if (secondChar == 'F') { // Run in fast mode
             DRT(wait2f,wait3f,wait4f);
           }
-          else if (secondChar == 'S') {
+          else if (secondChar == 'S') { // Run in slow mode
             DRT(wait2s,wait3s,wait4s);
           }
           else {
@@ -262,7 +272,7 @@ void loop() {
   }
 }
 
-void CmdA(String input) {
+void CmdD(String input) { // input designates which control relay to switch
   String relay = input.substring(1,3);
   int relNum = relay.toInt();
   if (relNum >= 1 && relNum <= 6) {
@@ -354,7 +364,7 @@ void CmdA(String input) {
   }
 }
 
-void CmdB(String input) {
+void CmdN(String input) { // input designates which control relay to switch
   String relay = input.substring(1,3);
   int relNum = relay.toInt();
   if (relNum >= 1 && relNum <= 6) {
@@ -446,7 +456,7 @@ void CmdB(String input) {
   }
 }
 
-void NodeM(String input) { // Set specified node to measure
+activeNode NodeM(String input, activeNode &node) { // Set specified node to measure -- input has word and bit information
   char word = input.charAt(1);
   char bit = input.charAt(2);
   int wNum = word;
@@ -461,31 +471,39 @@ void NodeM(String input) { // Set specified node to measure
     bNum = bNum - 12; // Associates & with muxtable row 27 (i.e., 26)
   } else {
     bNum = bNum - 65; // Associates A through Z with muxtable row 1 through 26 (i.e., 0 to 25)
-  } 
-  // Switch the word line over to measure
-  digitalWriteFast(1,muxTable[wNum][0]);
-  digitalWriteFast(2,muxTable[wNum][1]);
-  digitalWriteFast(3,muxTable[wNum][2]);
-  digitalWriteFast(4,muxTable[wNum][3]);
-  digitalWriteFast(5,muxTable[wNum][4]);
-  digitalWriteFast(6,muxTable[wNum][5]);
-  digitalWriteFast(15,1);
-  delay(wait1);
-  digitalWriteFast(15,0);
-  // Switch the bit line over to measure
-  digitalWriteFast(7,muxTable[bNum][0]);
-  digitalWriteFast(8,muxTable[bNum][1]);
-  digitalWriteFast(9,muxTable[bNum][2]);
-  digitalWriteFast(10,muxTable[bNum][3]);
-  digitalWriteFast(11,muxTable[bNum][4]);
-  digitalWriteFast(12,muxTable[bNum][5]);
-  digitalWriteFast(17,1);
-  delay(wait1);
-  digitalWriteFast(17,0);
-  Error0();
+  }
+  if (node.wAct == 0 && node.bAct == 0) { // Checks that no other node is active before proceeding
+    // Switch the word line over to measure
+    digitalWriteFast(1,muxTable[wNum][0]);
+    digitalWriteFast(2,muxTable[wNum][1]);
+    digitalWriteFast(3,muxTable[wNum][2]);
+    digitalWriteFast(4,muxTable[wNum][3]);
+    digitalWriteFast(5,muxTable[wNum][4]);
+    digitalWriteFast(6,muxTable[wNum][5]);
+    digitalWriteFast(15,1);
+    delay(wait1);
+    digitalWriteFast(15,0);
+    node.wAct = (wNum + 1);
+    // Switch the bit line over to measure
+    digitalWriteFast(7,muxTable[bNum][0]);
+    digitalWriteFast(8,muxTable[bNum][1]);
+    digitalWriteFast(9,muxTable[bNum][2]);
+    digitalWriteFast(10,muxTable[bNum][3]);
+    digitalWriteFast(11,muxTable[bNum][4]);
+    digitalWriteFast(12,muxTable[bNum][5]);
+    digitalWriteFast(17,1);
+    delay(wait1);
+    digitalWriteFast(17,0);
+    node.bAct = (bNum + 1);
+    Error0a(node);
+  }
+  else { // Case if another node is already active
+    Error4();
+  }  
+  return node;
 }
 
-void NodeH(String input) { // Set specified node back to hold
+activeNode NodeH(String input, activeNode &node) { // Set specified node back to hold -- input has word and bit information
   char word = input.charAt(1);
   char bit = input.charAt(2);
   int wNum = word;
@@ -499,28 +517,126 @@ void NodeH(String input) { // Set specified node back to hold
     bNum = bNum - 12; // Associates & with muxtable row 27 (i.e., 26)
   } else {
     bNum = bNum - 65; // Associates A through Z with muxtable row 1 through 26 (i.e., 0 to 25)
+  }
+  if (node.wAct == (wNum + 1) && node.bAct == (bNum + 1)) { // Checks that the active node is being switched to hold
+    // Switch the word line over to hold
+    digitalWriteFast(1,muxTable[wNum][0]);
+    digitalWriteFast(2,muxTable[wNum][1]);
+    digitalWriteFast(3,muxTable[wNum][2]);
+    digitalWriteFast(4,muxTable[wNum][3]);
+    digitalWriteFast(5,muxTable[wNum][4]);
+    digitalWriteFast(6,muxTable[wNum][5]);
+    digitalWriteFast(16,1);
+    delay(wait1);
+    digitalWriteFast(16,0);
+    node.wAct = 0;
+    // Switch the bit line over to hold
+    digitalWriteFast(7,muxTable[bNum][0]);
+    digitalWriteFast(8,muxTable[bNum][1]);
+    digitalWriteFast(9,muxTable[bNum][2]);
+    digitalWriteFast(10,muxTable[bNum][3]);
+    digitalWriteFast(11,muxTable[bNum][4]);
+    digitalWriteFast(12,muxTable[bNum][5]);
+    digitalWriteFast(18,1);
+    delay(wait1);
+    digitalWriteFast(18,0);
+    node.bAct = 0;
+    Error0a(node);
+  }
+  else { // Case if the active node hasn't been selected to switch to hold
+    Error5();
+  }
+  return node;
+}
+
+activeNode ShiftW(String input,activeNode &node) { // Shift measured node along a wordline -- input has hold and measure information
+  char hold = input.charAt(1);
+  char meas = input.charAt(2);
+  int hNum = hold;
+  int mNum = meas;
+  if (hold == '&') {
+    hNum = hNum - 12; // Associates & with muxtable row 27 (i.e., 26)
+  } else {
+    hNum = hNum - 65; // Associates A through Z with muxtable row 1 through 26 (i.e., 0 to 25)
+  }
+  if (meas == '&') {
+    mNum = mNum - 12; // Associates & with muxtable row 27 (i.e., 26)
+  } else {
+    mNum = mNum - 65; // Associates A through Z with muxtable row 1 through 26 (i.e., 0 to 25)
   } 
-  // Switch the word line over to hold
-  digitalWriteFast(1,muxTable[wNum][0]);
-  digitalWriteFast(2,muxTable[wNum][1]);
-  digitalWriteFast(3,muxTable[wNum][2]);
-  digitalWriteFast(4,muxTable[wNum][3]);
-  digitalWriteFast(5,muxTable[wNum][4]);
-  digitalWriteFast(6,muxTable[wNum][5]);
-  digitalWriteFast(16,1);
-  delay(wait1);
-  digitalWriteFast(16,0);
-  // Switch the bit line over to hold
-  digitalWriteFast(7,muxTable[bNum][0]);
-  digitalWriteFast(8,muxTable[bNum][1]);
-  digitalWriteFast(9,muxTable[bNum][2]);
-  digitalWriteFast(10,muxTable[bNum][3]);
-  digitalWriteFast(11,muxTable[bNum][4]);
-  digitalWriteFast(12,muxTable[bNum][5]);
-  digitalWriteFast(18,1);
-  delay(wait1);
-  digitalWriteFast(18,0);
-  Error0();
+  if (node.wAct == (hNum + 1)) { // Checks that the active word line is being switched to hold
+    // Switch the first word input over to hold
+    digitalWriteFast(1,muxTable[hNum][0]);
+    digitalWriteFast(2,muxTable[hNum][1]);
+    digitalWriteFast(3,muxTable[hNum][2]);
+    digitalWriteFast(4,muxTable[hNum][3]);
+    digitalWriteFast(5,muxTable[hNum][4]);
+    digitalWriteFast(6,muxTable[hNum][5]);
+    digitalWriteFast(16,1);
+    delay(wait1);
+    digitalWriteFast(16,0);
+    // Switch the second word input over to meas
+    digitalWriteFast(1,muxTable[mNum][0]);
+    digitalWriteFast(2,muxTable[mNum][1]);
+    digitalWriteFast(3,muxTable[mNum][2]);
+    digitalWriteFast(4,muxTable[mNum][3]);
+    digitalWriteFast(5,muxTable[mNum][4]);
+    digitalWriteFast(6,muxTable[mNum][5]);
+    digitalWriteFast(15,1);
+    delay(wait1);
+    digitalWriteFast(15,0);
+    node.wAct = mNum + 1;
+    Error0a(node);
+  }
+  else {
+    Error6();
+  }
+  return node;
+}
+
+activeNode ShiftB(String input, activeNode &node) { // Shift measured node along a bitline -- input has hold and measure information
+  char hold = input.charAt(1);
+  char meas = input.charAt(2);
+  int hNum = hold;
+  int mNum = meas;
+  if (hold == '&') {
+    hNum = hNum - 12; // Associates & with muxtable row 27 (i.e., 26)
+  } else {
+    hNum = hNum - 65; // Associates A through Z with muxtable row 1 through 26 (i.e., 0 to 25)
+  }
+  if (meas == '&') {
+    mNum = mNum - 12; // Associates & with muxtable row 27 (i.e., 26)
+  } else {
+    mNum = mNum - 65; // Associates A through Z with muxtable row 1 through 26 (i.e., 0 to 25)
+  }
+  if (node.bAct == (hNum + 1)) { // Checks that the active bit line is being switched to hold 
+    // Switch the first bit input over to hold
+    digitalWriteFast(7,muxTable[hNum][0]);
+    digitalWriteFast(8,muxTable[hNum][1]);
+    digitalWriteFast(9,muxTable[hNum][2]);
+    digitalWriteFast(10,muxTable[hNum][3]);
+    digitalWriteFast(11,muxTable[hNum][4]);
+    digitalWriteFast(12,muxTable[hNum][5]);
+    digitalWriteFast(18,1);
+    delay(wait1);
+    digitalWriteFast(18,0);
+    // Switch the second bit input over to meas
+    digitalWriteFast(7,muxTable[mNum][0]);
+    digitalWriteFast(8,muxTable[mNum][1]);
+    digitalWriteFast(9,muxTable[mNum][2]);
+    digitalWriteFast(10,muxTable[mNum][3]);
+    digitalWriteFast(11,muxTable[mNum][4]);
+    digitalWriteFast(12,muxTable[mNum][5]);
+    digitalWriteFast(17,1);
+    delay(wait1);
+    digitalWriteFast(17,0);
+    node.bAct = mNum + 1;
+    Error0a(node);
+  }
+  else {
+    Error6();
+  }
+  return node;
 }
 
 void ResetControl() {
@@ -782,6 +898,15 @@ void Error0() { // Process ok
   Serial.println("Error 0: OK");
 }
 
+void Error0a(activeNode node) { // Process ok but with information about the currently active node
+  Serial.print("Active Node is: ");
+  Serial.print(node.wAct);
+  Serial.print(",");
+  Serial.print(node.bAct);
+  Serial.print(" --- ");
+  Serial.println("Error 0a: OK");
+}
+
 void Error1() { // Invalid prefix handler
   Serial.println("Error 1: Invalid prefix");
 }
@@ -792,4 +917,16 @@ void Error2() { // Invalid command handler
 
 void Error3() { // Relay out of range handler
   Serial.println("Error 3: Relay out of range");
+}
+
+void Error4() { // Attempt to activate more than one node
+  Serial.println("Error 4: Another node is already active");
+}
+
+void Error5() { // Attempt to switch inactive node to hold
+  Serial.println("Error 5: The requested node is not active");
+}
+
+void Error6() { // Attempt to switch inactive line to hold
+  Serial.println("Error 6: The requested word/bit line to hold is not active");
 }
