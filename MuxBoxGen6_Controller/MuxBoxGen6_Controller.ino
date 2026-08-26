@@ -219,6 +219,9 @@ void loop() {
       }
       else if (input.length() == 3) {
         char firstChar = input.charAt(0);
+        if (firstChar == 'A') { // Request for active node information
+          Error0a(node);
+        }
         if (firstChar == 'D') { // Set control relay back to default
           CmdD(input);
         }
