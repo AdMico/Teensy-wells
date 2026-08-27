@@ -222,7 +222,7 @@ void loop() {
         if (firstChar == 'A') { // Request for active node information
           Error0a(node);
         }
-        if (firstChar == 'D') { // Set control relay back to default
+        else if (firstChar == 'D') { // Set control relay back to default
           CmdD(input);
         }
         else if (firstChar == 'N') { // Set control relay to non-default
@@ -243,24 +243,24 @@ void loop() {
         else if (firstChar == 'R') { // Run a reset routine
           char secondChar = input.charAt(1);
           if (secondChar == 'D') { // Reset all nodes to hold
-            ResetDevices(wait2r);
+            node = ResetDevices(wait2r,node);
           }
           else if (secondChar == 'C') { // Reset all control relays to default
             ResetControl();
           }
           else if (secondChar == 'A') { // Do both resets sequentially
-            ResetAll(wait2r);
+            node = ResetAll(wait2r,node);
           }          
         }
         else if (firstChar == 'T') { // Run Device Relay Test
           char secondChar = input.charAt(1);
           if (secondChar == 'F') { // Run in fast mode
-            DRT(wait2f,wait3f,wait4f);
+            node = DRT(wait2f,wait3f,wait4f,node);
           }
           else if (secondChar == 'S') { // Run in slow mode
-            DRT(wait2s,wait3s,wait4s);
+            node = DRT(wait2s,wait3s,wait4s,node);
           }
-          else {
+          else { // Invalid command so send error
             Error2();
           }  
         }
@@ -687,7 +687,7 @@ void ResetControl() {
   Error0();
 }
 
-void ResetDevices(int wait2) { // Reset all device relays to hold
+activeNode ResetDevices(int wait2, activeNode &node) { // Reset all device relays to hold
   // Ensure the word relays are all set to hold
   for (int i = 0; i < 27; i++) {
     digitalWriteFast(1,muxTable[i][0]);
@@ -736,10 +736,15 @@ void ResetDevices(int wait2) { // Reset all device relays to hold
   digitalWriteFast(12,0);
   digitalWriteFast(17,0);
   digitalWriteFast(18,0);
+
+  // Reset active node status
+  node.wAct = 0; 
+  node.bAct = 0;
   Error0();  
+  return node;
 }
 
-void ResetAll(int wait2) {
+activeNode ResetAll(int wait2, activeNode &node) {
   // Ensure all relays are set to defaults/hold
   // Set Source Int (def)
   digitalWriteFast(21,1);
@@ -830,10 +835,15 @@ void ResetAll(int wait2) {
   digitalWriteFast(12,0);
   digitalWriteFast(17,0);
   digitalWriteFast(18,0);
+
+  // Reset active node status
+  node.wAct = 0; 
+  node.bAct = 0;
   Error0();
+  return node;
 }
 
-void DRT(int wait2,int wait3,int wait4) { // Device Relay Test
+activeNode DRT(int wait2,int wait3,int wait4, activeNode &node) { // Device Relay Test
   // Begin Device Set -- Words first
 
   // Ensure the word relays are all set to hold
@@ -894,7 +904,12 @@ void DRT(int wait2,int wait3,int wait4) { // Device Relay Test
   digitalWriteFast(12,0);
   digitalWriteFast(17,0);
   digitalWriteFast(18,0);
+
+  // Reset active node status
+  node.wAct = 0; 
+  node.bAct = 0;
   Error0();
+  return node;
 }
 
 void Error0() { // Process ok
