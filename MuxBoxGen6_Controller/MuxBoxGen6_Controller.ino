@@ -1,25 +1,16 @@
 //
-// Brought to Teensy-wells v1.0.0 on Wed May 05 2026 by APM
+// Brought to Teensy-wells v1.1.0 on Wed May 05 2026 by APM
 //
 // @developers: Adam Micolich
 //
 // Main algorithm taking commands from the python software and implementing the switching of relays in the MuxBox.
 // Software runs continuously on the Teensy 4.1 during operation of the MuxBox.
 //
-// APM 08MAY26 -- Need to fix GPIO map in future instance when I fix the BC847 issue on the MuxBox PCB.
-
-// GPIO Mapping for V1 of Gen6 box
-// W-EN1 = 1; W-EN2 = 2; W-A0 = 3; W-A1 = 4; W-A2 = 5; W-A3 = 6; B-EN1 = 7; B-EN2 = 8; B-A0 = 9; B-A1 = 10; B-A2 = 11; B-A3 = 12;
-// Bias Words (def) = 13; Bias Bits = 14; Word On (def) = 15; Word Off = 16; Bit On (def) = 17; Bit Off = 18; +5V GND (def) = 19; +5V Active = 20;
-// Source Int (def) = 21; Source Ext = 22; Drain Int (def) = 23; Drain Ext = 24; Hold Int (def) = 25; Hold Ext = 26; Gate Int (def) = 27; Gate Ext = 28;
-// V1-Inv (def) = 29; V1-NonInv = 30; V2-Inv (def) = 31; V2-NonInv = 32; I1-Lo (def) = 33; I1-Hi = 34; I2-Lo (def) = 35; I2-Hi = 36;
-// I1-TIA (def) = 37, I1-CSA = 38, I2-TIA (def) = 39; I2-CSA = 40.
-//
-// GPIO Mapping as designed for Gen6 Box (will end up here on V2 boards)
-// W-EN1 = 1; W-EN2 = 2; W-A0 = 3; W-A1 = 4; W-A2 = 5; W-A3 = 6; B-EN1 = 7; B-EN2 = 8; B-A0 = 9; B-A1 = 10; B-A2 = 11; B-A3 = 12;
-// Bias Bits = 13; Bias Words (def) = 14; Word Off = 15; Word On (def) = 16; Bit Off = 17; Bit On (def) = 18; +5V Active = 19; +5V GND (def) = 20;
+// GPIO Mapping for Gen6 Box (V2+)
+// W-EN1 = 1; W-EN2 = 2; W-A0 = 3; W-A1 = 4; W-A2 = 5; W-A3 = 6; B-EN1 = 7; B-EN2 = 8; B-A0 = 9; B-A1 = 10; B-A2 = 11; B-A3 = 12; 
+// Bias Bits = 13; Bias Words (def) = 14; Word On = 15; Word Off (def) = 16; Bit On = 17; Bit Off (def) = 18; Gate TIA = 19; Hold TIA (def) = 20;
 // Source Ext = 21; Source Int (def) = 22; Drain Ext = 23; Drain Int (def) = 24; Hold Ext = 25; Hold Int (def) = 26; Gate Ext = 27; Gate Int (def) = 28;
-// V1-NonInv = 29; V1-Inv (def) = 30; V2-NonInv = 31; V2-Inv (def) = 32; I1-Hi = 33; I1-Lo (def) = 34; I2-Hi = 35; I2-Lo (def) = 36;
+// V1-Pos = 29; V1-Neg (def) = 30; V2-Pos = 31; V2-Neg (def) = 32; I1-Hi = 33; I1-Lo (def) = 34; I2-Hi = 35; I2-Lo (def) = 36;
 // I1-CSA = 37; I1-TIA (def) = 38; I2-CSA = 39; I2-TIA (def) = 40.
 
   int wait1 = 2; // Time relay coil is active (ms)
@@ -83,35 +74,35 @@ void setup() {
   pinMode(10,OUTPUT); // B-A1
   pinMode(11,OUTPUT); // B-A2
   pinMode(12,OUTPUT); // B-A3
-  pinMode(15,OUTPUT); // Word On (def)
-  pinMode(16,OUTPUT); // Word Off
-  pinMode(17,OUTPUT); // Bit On (def)
-  pinMode(18,OUTPUT); // Bit Off
+  pinMode(15,OUTPUT); // Word On
+  pinMode(16,OUTPUT); // Word Off (def)
+  pinMode(17,OUTPUT); // Bit On
+  pinMode(18,OUTPUT); // Bit Off (def)
   // Control Set
-  pinMode(13,OUTPUT); // Bias Bits (def)
-  pinMode(14,OUTPUT); // Bias Words
-  pinMode(19,OUTPUT); // +5V GND (def)
-  pinMode(20,OUTPUT); // +5V Active
-  pinMode(21,OUTPUT); // Source Int (def)
-  pinMode(22,OUTPUT); // Source Ext
-  pinMode(23,OUTPUT); // Drain Int (def)
-  pinMode(24,OUTPUT); // Drain Ext
-  pinMode(25,OUTPUT); // Hold Int (def)
-  pinMode(26,OUTPUT); // Hold Ext
-  pinMode(27,OUTPUT); // Gate Int (def)
-  pinMode(28,OUTPUT); // Gate Ext
-  pinMode(29,OUTPUT); // V1-Inv (def)
-  pinMode(30,OUTPUT); // V1-NonInv
-  pinMode(31,OUTPUT); // V2-Inv (def)
-  pinMode(32,OUTPUT); // V2-NonInv
-  pinMode(33,OUTPUT); // I1-Lo (def)
-  pinMode(34,OUTPUT); // I1-Hi
-  pinMode(35,OUTPUT); // I2-Lo (def)
-  pinMode(36,OUTPUT); // I2-Hi
-  pinMode(37,OUTPUT); // I1-TIA (def)
-  pinMode(38,OUTPUT); // I1-CSA
-  pinMode(39,OUTPUT); // I2-TIA (def)
-  pinMode(40,OUTPUT); // I2-CSA
+  pinMode(13,OUTPUT); // Bias Bits
+  pinMode(14,OUTPUT); // Bias Words (def)
+  pinMode(19,OUTPUT); // Gate TIA
+  pinMode(20,OUTPUT); // Hold TIA (def)
+  pinMode(21,OUTPUT); // Source Ext
+  pinMode(22,OUTPUT); // Source Int (def)
+  pinMode(23,OUTPUT); // Drain Ext
+  pinMode(24,OUTPUT); // Drain Int (def)
+  pinMode(25,OUTPUT); // Hold Ext
+  pinMode(26,OUTPUT); // Hold Int (def)
+  pinMode(27,OUTPUT); // Gate Ext
+  pinMode(28,OUTPUT); // Gate Int (def)
+  pinMode(29,OUTPUT); // V1-Pos
+  pinMode(30,OUTPUT); // V1-Neg (def)
+  pinMode(31,OUTPUT); // V2-Pos 
+  pinMode(32,OUTPUT); // V2-Neg (def)
+  pinMode(33,OUTPUT); // I1-Hi
+  pinMode(34,OUTPUT); // I1-Lo (def)
+  pinMode(35,OUTPUT); // I2-Hi
+  pinMode(36,OUTPUT); // I2-Lo (def)
+  pinMode(37,OUTPUT); // I1-CSA
+  pinMode(38,OUTPUT); // I1-TIA (def)
+  pinMode(39,OUTPUT); // I2-CSA
+  pinMode(40,OUTPUT); // I2-TIA (def)
 
   // Set all control bits to OFF
   digitalWriteFast(1,0);
@@ -131,52 +122,58 @@ void setup() {
   digitalWriteFast(17,0);
   digitalWriteFast(18,0);
 
-  // Make sure the 5V power line is active, otherwise the other relays won't switch.
+  // Correct for 'Pin 25 activates during bootload' issue
+  //Serial.println("Hold Int (def)");
+  digitalWriteFast(26,HIGH);
+  delay(wait1);
+  digitalWriteFast(26,LOW);
+  delay(1000);
+
+  // Ensure the control relays are set to defaults
+  // Set Hold-TIA (def)
   digitalWriteFast(20,1);
   delay(wait1);
   digitalWriteFast(20,0);
-
-  // Ensure the control relays are set to defaults
   // Set Source Int (def)
-  digitalWriteFast(21,1);
+  digitalWriteFast(22,1);
   delay(wait1);
-  digitalWriteFast(21,0);
+  digitalWriteFast(22,0);
   // Set Drain Int (def)
-  digitalWriteFast(23,1);
+  digitalWriteFast(24,1);
   delay(wait1);
-  digitalWriteFast(23,0);
+  digitalWriteFast(24,0);
   // Set Hold Int (def)
-  digitalWriteFast(25,1);
+  digitalWriteFast(26,1);
   delay(wait1);
-  digitalWriteFast(25,0);
+  digitalWriteFast(26,0);
   // Set Gate Int (def)
-  digitalWriteFast(27,1);
+  digitalWriteFast(28,1);
   delay(wait1);
-  digitalWriteFast(27,0);
-  // Set V1-Inv (def)
-  digitalWriteFast(29,1);
+  digitalWriteFast(28,0);
+  // Set V1-Neg (def)
+  digitalWriteFast(30,1);
   delay(wait1);
-  digitalWriteFast(29,0);
-  // Set V2-Inv (def)
-  digitalWriteFast(31,1);
+  digitalWriteFast(30,0);
+  // Set V2-Neg (def)
+  digitalWriteFast(32,1);
   delay(wait1);
-  digitalWriteFast(31,0);
+  digitalWriteFast(32,0);
   // Set I1-Lo (def)
-  digitalWriteFast(33,1);
+  digitalWriteFast(34,1);
   delay(wait1);
-  digitalWriteFast(33,0);
+  digitalWriteFast(34,0);
   // Set I2-Lo (def)
-  digitalWriteFast(35,1);
+  digitalWriteFast(36,1);
   delay(wait1);
-  digitalWriteFast(35,0);
+  digitalWriteFast(36,0);
   // Set I1-TIA (def)
-  digitalWriteFast(37,1);
+  digitalWriteFast(38,1);
   delay(wait1);
-  digitalWriteFast(37,0);
+  digitalWriteFast(38,0);
   // Set I2-TIA (def)
-  digitalWriteFast(39,1);
+  digitalWriteFast(40,1);
   delay(wait1);
-  digitalWriteFast(39,0);
+  digitalWriteFast(40,0);
 
   // Ensure the word relays are all set to hold
   for (int i = 0; i < 27; i++) {
@@ -287,98 +284,6 @@ void CmdD(String input) { // input designates which control relay to switch
         Error0();
       }
       else if (relNum == 2) {
-        digitalWriteFast(19,1);
-        delay(wait1);
-        digitalWriteFast(19,0);
-        Error0();
-      }
-      else {
-        digitalWriteFast(21,1);
-        delay(wait1);
-        digitalWriteFast(21,0);
-        Error0();
-      }
-    }
-    else {
-      if (relNum == 4) {
-        digitalWriteFast(23,1);
-        delay(wait1);
-        digitalWriteFast(23,0);
-        Error0();
-      }
-      else if (relNum == 5) {
-        digitalWriteFast(25,1);
-        delay(wait1);
-        digitalWriteFast(25,0);
-        Error0();
-      }
-      else {
-        digitalWriteFast(27,1);
-        delay(wait1);
-        digitalWriteFast(27,0);
-        Error0();
-      }
-    }
-  } 
-  else if (relNum >= 7 && relNum <= 12) {
-    if (relNum >= 7 && relNum <= 9) {
-      if (relNum == 7) {
-        digitalWriteFast(29,1);
-        delay(wait1);
-        digitalWriteFast(29,0);
-        Error0();
-      }
-      else if (relNum == 8) {
-        digitalWriteFast(31,1);
-        delay(wait1);
-        digitalWriteFast(31,0);
-        Error0();
-      }
-      else {
-        digitalWriteFast(33,1);
-        delay(wait1);
-        digitalWriteFast(33,0);
-        Error0();
-      }
-    }
-    else {
-      if (relNum == 10) {
-        digitalWriteFast(35,1);
-        delay(wait1);
-        digitalWriteFast(35,0);
-        Error0();
-      }
-      else if (relNum == 11) {
-        digitalWriteFast(37,1);
-        delay(wait1);
-        digitalWriteFast(37,0);
-        Error0();
-      }
-      else {
-        digitalWriteFast(39,1);
-        delay(wait1);
-        digitalWriteFast(39,0);
-        Error0();
-      }
-    }
-  } 
-  else {
-    Error3();
-  }
-}
-
-void CmdN(String input) { // input designates which control relay to switch
-  String relay = input.substring(1,3);
-  int relNum = relay.toInt();
-  if (relNum >= 1 && relNum <= 6) {
-    if (relNum >= 1 && relNum <= 3) {
-      if (relNum == 1) {
-        digitalWriteFast(13,1);
-        delay(wait1);
-        digitalWriteFast(13,0);
-        Error0();
-      }
-      else if (relNum == 2) {
         digitalWriteFast(20,1);
         delay(wait1);
         digitalWriteFast(20,0);
@@ -450,6 +355,98 @@ void CmdN(String input) { // input designates which control relay to switch
         digitalWriteFast(40,1);
         delay(wait1);
         digitalWriteFast(40,0);
+        Error0();
+      }
+    }
+  } 
+  else {
+    Error3();
+  }
+}
+
+void CmdN(String input) { // input designates which control relay to switch
+  String relay = input.substring(1,3);
+  int relNum = relay.toInt();
+  if (relNum >= 1 && relNum <= 6) {
+    if (relNum >= 1 && relNum <= 3) {
+      if (relNum == 1) {
+        digitalWriteFast(13,1);
+        delay(wait1);
+        digitalWriteFast(13,0);
+        Error0();
+      }
+      else if (relNum == 2) {
+        digitalWriteFast(19,1);
+        delay(wait1);
+        digitalWriteFast(19,0);
+        Error0();
+      }
+      else {
+        digitalWriteFast(21,1);
+        delay(wait1);
+        digitalWriteFast(21,0);
+        Error0();
+      }
+    }
+    else {
+      if (relNum == 4) {
+        digitalWriteFast(23,1);
+        delay(wait1);
+        digitalWriteFast(23,0);
+        Error0();
+      }
+      else if (relNum == 5) {
+        digitalWriteFast(25,1);
+        delay(wait1);
+        digitalWriteFast(25,0);
+        Error0();
+      }
+      else {
+        digitalWriteFast(27,1);
+        delay(wait1);
+        digitalWriteFast(27,0);
+        Error0();
+      }
+    }
+  } 
+  else if (relNum >= 7 && relNum <= 12) {
+    if (relNum >= 7 && relNum <= 9) {
+      if (relNum == 7) {
+        digitalWriteFast(29,1);
+        delay(wait1);
+        digitalWriteFast(29,0);
+        Error0();
+      }
+      else if (relNum == 8) {
+        digitalWriteFast(31,1);
+        delay(wait1);
+        digitalWriteFast(31,0);
+        Error0();
+      }
+      else {
+        digitalWriteFast(33,1);
+        delay(wait1);
+        digitalWriteFast(33,0);
+        Error0();
+      }
+    }
+    else {
+      if (relNum == 10) {
+        digitalWriteFast(35,1);
+        delay(wait1);
+        digitalWriteFast(35,0);
+        Error0();
+      }
+      else if (relNum == 11) {
+        digitalWriteFast(37,1);
+        delay(wait1);
+        digitalWriteFast(37,0);
+        Error0();
+      }
+      else {
+        digitalWriteFast(39,1);
+        delay(wait1);
+        digitalWriteFast(39,0);
         Error0();
       }
     }
@@ -644,46 +641,50 @@ activeNode ShiftB(String input, activeNode &node) { // Shift measured node along
 
 void ResetControl() {
   // Ensure the control relays are set to defaults
+  // Set Hold TIA (def)
+  digitalWriteFast(20,1);
+  delay(wait1);
+  digitalWriteFast(20,0);
   // Set Source Int (def)
-  digitalWriteFast(21,1);
+  digitalWriteFast(22,1);
   delay(wait1);
-  digitalWriteFast(21,0);
+  digitalWriteFast(22,0);
   // Set Drain Int (def)
-  digitalWriteFast(23,1);
+  digitalWriteFast(24,1);
   delay(wait1);
-  digitalWriteFast(23,0);
+  digitalWriteFast(24,0);
   // Set Hold Int (def)
-  digitalWriteFast(25,1);
+  digitalWriteFast(26,1);
   delay(wait1);
-  digitalWriteFast(25,0);
+  digitalWriteFast(26,0);
   // Set Gate Int (def)
-  digitalWriteFast(27,1);
+  digitalWriteFast(28,1);
   delay(wait1);
-  digitalWriteFast(27,0);
-  // Set V1-Inv (def)
-  digitalWriteFast(29,1);
+  digitalWriteFast(28,0);
+  // Set V1-Neg (def)
+  digitalWriteFast(30,1);
   delay(wait1);
-  digitalWriteFast(29,0);
-  // Set V2-Inv (def)
-  digitalWriteFast(31,1);
+  digitalWriteFast(30,0);
+  // Set V2-Neg (def)
+  digitalWriteFast(32,1);
   delay(wait1);
-  digitalWriteFast(31,0);
+  digitalWriteFast(32,0);
   // Set I1-Lo (def)
-  digitalWriteFast(33,1);
+  digitalWriteFast(34,1);
   delay(wait1);
-  digitalWriteFast(33,0);
+  digitalWriteFast(34,0);
   // Set I2-Lo (def)
-  digitalWriteFast(35,1);
+  digitalWriteFast(36,1);
   delay(wait1);
-  digitalWriteFast(35,0);
+  digitalWriteFast(36,0);
   // Set I1-TIA (def)
-  digitalWriteFast(37,1);
+  digitalWriteFast(38,1);
   delay(wait1);
-  digitalWriteFast(37,0);
+  digitalWriteFast(38,0);
   // Set I2-TIA (def)
-  digitalWriteFast(39,1);
+  digitalWriteFast(40,1);
   delay(wait1);
-  digitalWriteFast(39,0);
+  digitalWriteFast(40,0);
   Error0();
 }
 
@@ -746,46 +747,50 @@ activeNode ResetDevices(int wait2, activeNode &node) { // Reset all device relay
 
 activeNode ResetAll(int wait2, activeNode &node) {
   // Ensure all relays are set to defaults/hold
+  // Set Hold TIA (def)
+  digitalWriteFast(20,1);
+  delay(wait1);
+  digitalWriteFast(20,0);
   // Set Source Int (def)
-  digitalWriteFast(21,1);
+  digitalWriteFast(22,1);
   delay(wait1);
-  digitalWriteFast(21,0);
+  digitalWriteFast(22,0);
   // Set Drain Int (def)
-  digitalWriteFast(23,1);
+  digitalWriteFast(24,1);
   delay(wait1);
-  digitalWriteFast(23,0);
+  digitalWriteFast(24,0);
   // Set Hold Int (def)
-  digitalWriteFast(25,1);
+  digitalWriteFast(26,1);
   delay(wait1);
-  digitalWriteFast(25,0);
+  digitalWriteFast(26,0);
   // Set Gate Int (def)
-  digitalWriteFast(27,1);
+  digitalWriteFast(28,1);
   delay(wait1);
-  digitalWriteFast(27,0);
-  // Set V1-Inv (def)
-  digitalWriteFast(29,1);
+  digitalWriteFast(28,0);
+  // Set V1-Neg (def)
+  digitalWriteFast(30,1);
   delay(wait1);
-  digitalWriteFast(29,0);
-  // Set V2-Inv (def)
-  digitalWriteFast(31,1);
+  digitalWriteFast(30,0);
+  // Set V2-Neg (def)
+  digitalWriteFast(32,1);
   delay(wait1);
-  digitalWriteFast(31,0);
+  digitalWriteFast(32,0);
   // Set I1-Lo (def)
-  digitalWriteFast(33,1);
+  digitalWriteFast(34,1);
   delay(wait1);
-  digitalWriteFast(33,0);
+  digitalWriteFast(34,0);
   // Set I2-Lo (def)
-  digitalWriteFast(35,1);
+  digitalWriteFast(36,1);
   delay(wait1);
-  digitalWriteFast(35,0);
+  digitalWriteFast(36,0);
   // Set I1-TIA (def)
-  digitalWriteFast(37,1);
+  digitalWriteFast(38,1);
   delay(wait1);
-  digitalWriteFast(37,0);
+  digitalWriteFast(38,0);
   // Set I2-TIA (def)
-  digitalWriteFast(39,1);
+  digitalWriteFast(40,1);
   delay(wait1);
-  digitalWriteFast(39,0);
+  digitalWriteFast(40,0);
 
   // Ensure the word relays are all set to hold
   for (int i = 0; i < 27; i++) {
