@@ -12,6 +12,10 @@
 // Source Ext = 21; Source Int (def) = 22; Drain Ext = 23; Drain Int (def) = 24; Hold Ext = 25; Hold Int (def) = 26; Gate Ext = 27; Gate Int (def) = 28;
 // V1-Pos = 29; V1-Neg (def) = 30; V2-Pos = 31; V2-Neg (def) = 32; I1-Hi = 33; I1-Lo (def) = 34; I2-Hi = 35; I2-Lo (def) = 36;
 // I1-CSA = 37; I1-TIA (def) = 38; I2-CSA = 39; I2-TIA (def) = 40.
+//
+// For V2 boards Word On = 16; Word Off (def) = 15; Bit On = 18; Bit Off (def) = 17 this is a correction for an issue in Nets D-W1, D-W2, D-B1 and D-B2 for this version.
+// Problem is resolved on V2a+ boards, and the assignments 15 vs 16 and 17 vs 18 will be fixed in a future software update when V2a boards are made -- APM 19Nov26. 
+
 
   int wait1 = 2; // Time relay coil is active (ms)
   int wait2r = 5; // Time between on and off (ms)
@@ -74,10 +78,10 @@ void setup() {
   pinMode(10,OUTPUT); // B-A1
   pinMode(11,OUTPUT); // B-A2
   pinMode(12,OUTPUT); // B-A3
-  pinMode(15,OUTPUT); // Word On
-  pinMode(16,OUTPUT); // Word Off (def)
-  pinMode(17,OUTPUT); // Bit On
-  pinMode(18,OUTPUT); // Bit Off (def)
+pinMode(15,OUTPUT); // Word Off (def) -- V2 board only, fix later APM 19NOV26
+  pinMode(16,OUTPUT); // Word On -- V2 board only, fix later APM 19NOV26
+  pinMode(17,OUTPUT); // Bit Off (def) -- V2 board only, fix later APM 19NOV26
+  pinMode(18,OUTPUT); // Bit On -- V2 board only, fix later APM 19NOV26
   // Control Set
   pinMode(13,OUTPUT); // Bias Bits
   pinMode(14,OUTPUT); // Bias Words (def)
@@ -183,9 +187,9 @@ void setup() {
     digitalWriteFast(4,muxTable[i][3]);
     digitalWriteFast(5,muxTable[i][4]);
     digitalWriteFast(6,muxTable[i][5]);
-    digitalWriteFast(16,1);
+    digitalWriteFast(15,1);
     delay(wait1);
-    digitalWriteFast(16,0);
+    digitalWriteFast(15,0);
   }
 
   // Ensure the bit relays are all set to hold
@@ -196,9 +200,9 @@ void setup() {
     digitalWriteFast(10,muxTable[j][3]);
     digitalWriteFast(11,muxTable[j][4]);
     digitalWriteFast(12,muxTable[j][5]);
-    digitalWriteFast(18,1);
+    digitalWriteFast(17,1);
     delay(wait1);
-    digitalWriteFast(18,0);
+    digitalWriteFast(17,0);
   }
 
   // Prep the serial connection
@@ -480,9 +484,9 @@ activeNode NodeM(String input, activeNode &node) { // Set specified node to meas
     digitalWriteFast(4,muxTable[wNum][3]);
     digitalWriteFast(5,muxTable[wNum][4]);
     digitalWriteFast(6,muxTable[wNum][5]);
-    digitalWriteFast(15,1);
+    digitalWriteFast(16,1);
     delay(wait1);
-    digitalWriteFast(15,0);
+    digitalWriteFast(16,0);
     node.wAct = (wNum + 1);
     // Switch the bit line over to measure
     digitalWriteFast(7,muxTable[bNum][0]);
@@ -491,9 +495,9 @@ activeNode NodeM(String input, activeNode &node) { // Set specified node to meas
     digitalWriteFast(10,muxTable[bNum][3]);
     digitalWriteFast(11,muxTable[bNum][4]);
     digitalWriteFast(12,muxTable[bNum][5]);
-    digitalWriteFast(17,1);
+    digitalWriteFast(18,1);
     delay(wait1);
-    digitalWriteFast(17,0);
+    digitalWriteFast(18,0);
     node.bAct = (bNum + 1);
     Error0a(node);
   }
@@ -526,9 +530,9 @@ activeNode NodeH(String input, activeNode &node) { // Set specified node back to
     digitalWriteFast(4,muxTable[wNum][3]);
     digitalWriteFast(5,muxTable[wNum][4]);
     digitalWriteFast(6,muxTable[wNum][5]);
-    digitalWriteFast(16,1);
+    digitalWriteFast(15,1);
     delay(wait1);
-    digitalWriteFast(16,0);
+    digitalWriteFast(15,0);
     node.wAct = 0;
     // Switch the bit line over to hold
     digitalWriteFast(7,muxTable[bNum][0]);
@@ -537,9 +541,9 @@ activeNode NodeH(String input, activeNode &node) { // Set specified node back to
     digitalWriteFast(10,muxTable[bNum][3]);
     digitalWriteFast(11,muxTable[bNum][4]);
     digitalWriteFast(12,muxTable[bNum][5]);
-    digitalWriteFast(18,1);
+    digitalWriteFast(17,1);
     delay(wait1);
-    digitalWriteFast(18,0);
+    digitalWriteFast(17,0);
     node.bAct = 0;
     Error0a(node);
   }
@@ -572,9 +576,9 @@ activeNode ShiftW(String input,activeNode &node) { // Shift measured node along 
     digitalWriteFast(4,muxTable[hNum][3]);
     digitalWriteFast(5,muxTable[hNum][4]);
     digitalWriteFast(6,muxTable[hNum][5]);
-    digitalWriteFast(16,1);
+    digitalWriteFast(15,1);
     delay(wait1);
-    digitalWriteFast(16,0);
+    digitalWriteFast(15,0);
     // Switch the second word input over to meas
     digitalWriteFast(1,muxTable[mNum][0]);
     digitalWriteFast(2,muxTable[mNum][1]);
@@ -582,9 +586,9 @@ activeNode ShiftW(String input,activeNode &node) { // Shift measured node along 
     digitalWriteFast(4,muxTable[mNum][3]);
     digitalWriteFast(5,muxTable[mNum][4]);
     digitalWriteFast(6,muxTable[mNum][5]);
-    digitalWriteFast(15,1);
+    digitalWriteFast(16,1);
     delay(wait1);
-    digitalWriteFast(15,0);
+    digitalWriteFast(16,0);
     node.wAct = mNum + 1;
     Error0a(node);
   }
@@ -617,9 +621,9 @@ activeNode ShiftB(String input, activeNode &node) { // Shift measured node along
     digitalWriteFast(10,muxTable[hNum][3]);
     digitalWriteFast(11,muxTable[hNum][4]);
     digitalWriteFast(12,muxTable[hNum][5]);
-    digitalWriteFast(18,1);
+    digitalWriteFast(17,1);
     delay(wait1);
-    digitalWriteFast(18,0);
+    digitalWriteFast(17,0);
     // Switch the second bit input over to meas
     digitalWriteFast(7,muxTable[mNum][0]);
     digitalWriteFast(8,muxTable[mNum][1]);
@@ -627,9 +631,9 @@ activeNode ShiftB(String input, activeNode &node) { // Shift measured node along
     digitalWriteFast(10,muxTable[mNum][3]);
     digitalWriteFast(11,muxTable[mNum][4]);
     digitalWriteFast(12,muxTable[mNum][5]);
-    digitalWriteFast(17,1);
+    digitalWriteFast(18,1);
     delay(wait1);
-    digitalWriteFast(17,0);
+    digitalWriteFast(18,0);
     node.bAct = mNum + 1;
     Error0a(node);
   }
@@ -697,9 +701,9 @@ activeNode ResetDevices(int wait2, activeNode &node) { // Reset all device relay
     digitalWriteFast(4,muxTable[i][3]);
     digitalWriteFast(5,muxTable[i][4]);
     digitalWriteFast(6,muxTable[i][5]);
-    digitalWriteFast(16,1);
+    digitalWriteFast(15,1);
     delay(wait1);
-    digitalWriteFast(16,0);
+    digitalWriteFast(15,0);
     delay(wait2);
   }
 
@@ -722,9 +726,9 @@ activeNode ResetDevices(int wait2, activeNode &node) { // Reset all device relay
     digitalWriteFast(10,muxTable[j][3]);
     digitalWriteFast(11,muxTable[j][4]);
     digitalWriteFast(12,muxTable[j][5]);
-    digitalWriteFast(18,1);
+    digitalWriteFast(17,1);
     delay(wait1);
-    digitalWriteFast(18,0);
+    digitalWriteFast(17,0);
     delay(wait2);
   }
 
@@ -800,9 +804,9 @@ activeNode ResetAll(int wait2, activeNode &node) {
     digitalWriteFast(4,muxTable[i][3]);
     digitalWriteFast(5,muxTable[i][4]);
     digitalWriteFast(6,muxTable[i][5]);
-    digitalWriteFast(16,1);
+    digitalWriteFast(15,1);
     delay(wait1);
-    digitalWriteFast(16,0);
+    digitalWriteFast(15,0);
     delay(wait2);
   }
 
@@ -825,9 +829,9 @@ activeNode ResetAll(int wait2, activeNode &node) {
     digitalWriteFast(10,muxTable[j][3]);
     digitalWriteFast(11,muxTable[j][4]);
     digitalWriteFast(12,muxTable[j][5]);
-    digitalWriteFast(18,1);
+    digitalWriteFast(17,1);
     delay(wait1);
-    digitalWriteFast(18,0);
+    digitalWriteFast(17,0);
     delay(wait2);
   }
 
@@ -859,13 +863,13 @@ activeNode DRT(int wait2,int wait3,int wait4, activeNode &node) { // Device Rela
     digitalWriteFast(4,muxTable[i][3]);
     digitalWriteFast(5,muxTable[i][4]);
     digitalWriteFast(6,muxTable[i][5]);
-    digitalWriteFast(15,1);
-    delay(wait1);
-    digitalWriteFast(15,0);
-    delay(wait2);
     digitalWriteFast(16,1);
     delay(wait1);
     digitalWriteFast(16,0);
+    delay(wait2);
+    digitalWriteFast(15,1);
+    delay(wait1);
+    digitalWriteFast(15,0);
     delay(wait3);
   }
 
@@ -890,13 +894,13 @@ activeNode DRT(int wait2,int wait3,int wait4, activeNode &node) { // Device Rela
     digitalWriteFast(10,muxTable[j][3]);
     digitalWriteFast(11,muxTable[j][4]);
     digitalWriteFast(12,muxTable[j][5]);
-    digitalWriteFast(17,1);
-    delay(wait1);
-    digitalWriteFast(17,0);
-    delay(wait2);
     digitalWriteFast(18,1);
     delay(wait1);
     digitalWriteFast(18,0);
+    delay(wait2);
+    digitalWriteFast(17,1);
+    delay(wait1);
+    digitalWriteFast(17,0);
     delay(wait3);
   }
 

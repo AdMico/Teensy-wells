@@ -15,6 +15,9 @@
 // Source Ext = 21; Source Int (def) = 22; Drain Ext = 23; Drain Int (def) = 24; Hold Ext = 25; Hold Int (def) = 26; Gate Ext = 27; Gate Int (def) = 28;
 // V1-Pos = 29; V1-Neg (def) = 30; V2-Pos = 31; V2-Neg (def) = 32; I1-Hi = 33; I1-Lo (def) = 34; I2-Hi = 35; I2-Lo (def) = 36;
 // I1-CSA = 37; I1-TIA (def) = 38; I2-CSA = 39; I2-TIA (def) = 40.
+//
+// For V2 boards Word On = 16; Word Off (def) = 15; Bit On = 18; Bit Off (def) = 17 this is a correction for an issue in Nets D-W1, D-W2, D-B1 and D-B2 for this version.
+// Problem is resolved on V2a+ boards, and the assignments 15 vs 16 and 17 vs 18 will be fixed in a future software update when V2a boards are made -- APM 19Nov26. 
 
 int count = 1; // Number of times to switch the relay set
 int counter = 0;
@@ -40,10 +43,10 @@ void setup() {
   pinMode(10,OUTPUT); // B-A1
   pinMode(11,OUTPUT); // B-A2
   pinMode(12,OUTPUT); // B-A3
-  pinMode(15,OUTPUT); // Word On
-  pinMode(16,OUTPUT); // Word Off (def)
-  pinMode(17,OUTPUT); // Bit On
-  pinMode(18,OUTPUT); // Bit Off (def)
+  pinMode(15,OUTPUT); // Word Off (def) -- V2 board only, fix later APM 19NOV26
+  pinMode(16,OUTPUT); // Word On -- V2 board only, fix later APM 19NOV26
+  pinMode(17,OUTPUT); // Bit Off (def) -- V2 board only, fix later APM 19NOV26
+  pinMode(18,OUTPUT); // Bit On -- V2 board only, fix later APM 19NOV26
   // Control Set
   pinMode(13,OUTPUT); // Bias Bits
   pinMode(14,OUTPUT); // Bias Words (def)
@@ -245,13 +248,13 @@ void loop() {
     digitalWriteFast(4,LOW);
     digitalWriteFast(5,LOW);
     digitalWriteFast(6,LOW);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-2");
@@ -261,13 +264,13 @@ void loop() {
     digitalWriteFast(4,LOW);
     digitalWriteFast(5,LOW);
     digitalWriteFast(6,LOW);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-3");
@@ -277,13 +280,13 @@ void loop() {
     digitalWriteFast(4,HIGH);
     digitalWriteFast(5,LOW);
     digitalWriteFast(6,LOW);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-4");
@@ -293,13 +296,13 @@ void loop() {
     digitalWriteFast(4,HIGH);
     digitalWriteFast(5,LOW);
     digitalWriteFast(6,LOW);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-5");
@@ -309,13 +312,13 @@ void loop() {
     digitalWriteFast(4,LOW);
     digitalWriteFast(5,HIGH);
     digitalWriteFast(6,LOW);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-6");
@@ -325,13 +328,13 @@ void loop() {
     digitalWriteFast(4,LOW);
     digitalWriteFast(5,HIGH);
     digitalWriteFast(6,LOW);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-7");
@@ -341,13 +344,13 @@ void loop() {
     digitalWriteFast(4,HIGH);
     digitalWriteFast(5,HIGH);
     digitalWriteFast(6,LOW);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-8");
@@ -357,13 +360,13 @@ void loop() {
     digitalWriteFast(4,HIGH);
     digitalWriteFast(5,HIGH);
     digitalWriteFast(6,LOW);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-9");
@@ -373,13 +376,13 @@ void loop() {
     digitalWriteFast(4,LOW);
     digitalWriteFast(5,LOW);
     digitalWriteFast(6,HIGH);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-10");
@@ -389,13 +392,13 @@ void loop() {
     digitalWriteFast(4,LOW);
     digitalWriteFast(5,LOW);
     digitalWriteFast(6,HIGH);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-11");
@@ -405,13 +408,13 @@ void loop() {
     digitalWriteFast(4,HIGH);
     digitalWriteFast(5,LOW);
     digitalWriteFast(6,HIGH);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-12");
@@ -421,13 +424,13 @@ void loop() {
     digitalWriteFast(4,HIGH);
     digitalWriteFast(5,LOW);
     digitalWriteFast(6,HIGH);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-13");
@@ -437,13 +440,13 @@ void loop() {
     digitalWriteFast(4,LOW);
     digitalWriteFast(5,HIGH);
     digitalWriteFast(6,HIGH);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-14");
@@ -453,13 +456,13 @@ void loop() {
     digitalWriteFast(4,LOW);
     digitalWriteFast(5,HIGH);
     digitalWriteFast(6,HIGH);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-15");
@@ -469,13 +472,13 @@ void loop() {
     digitalWriteFast(4,LOW);
     digitalWriteFast(5,LOW);
     digitalWriteFast(6,LOW);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-16");
@@ -485,13 +488,13 @@ void loop() {
     digitalWriteFast(4,LOW);
     digitalWriteFast(5,LOW);
     digitalWriteFast(6,LOW);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-17");
@@ -501,13 +504,13 @@ void loop() {
     digitalWriteFast(4,HIGH);
     digitalWriteFast(5,LOW);
     digitalWriteFast(6,LOW);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-18");
@@ -517,13 +520,13 @@ void loop() {
     digitalWriteFast(4,HIGH);
     digitalWriteFast(5,LOW);
     digitalWriteFast(6,LOW);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-19");
@@ -533,13 +536,13 @@ void loop() {
     digitalWriteFast(4,LOW);
     digitalWriteFast(5,HIGH);
     digitalWriteFast(6,LOW);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-20");
@@ -549,13 +552,13 @@ void loop() {
     digitalWriteFast(4,LOW);
     digitalWriteFast(5,HIGH);
     digitalWriteFast(6,LOW);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-21");
@@ -565,13 +568,13 @@ void loop() {
     digitalWriteFast(4,HIGH);
     digitalWriteFast(5,HIGH);
     digitalWriteFast(6,LOW);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-22");
@@ -581,13 +584,13 @@ void loop() {
     digitalWriteFast(4,HIGH);
     digitalWriteFast(5,HIGH);
     digitalWriteFast(6,LOW);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-23");
@@ -597,13 +600,13 @@ void loop() {
     digitalWriteFast(4,LOW);
     digitalWriteFast(5,LOW);
     digitalWriteFast(6,HIGH);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-24");
@@ -613,13 +616,13 @@ void loop() {
     digitalWriteFast(4,LOW);
     digitalWriteFast(5,LOW);
     digitalWriteFast(6,HIGH);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-25");
@@ -629,13 +632,13 @@ void loop() {
     digitalWriteFast(4,HIGH);
     digitalWriteFast(5,LOW);
     digitalWriteFast(6,HIGH);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-26");
@@ -645,13 +648,13 @@ void loop() {
     digitalWriteFast(4,HIGH);
     digitalWriteFast(5,LOW);
     digitalWriteFast(6,HIGH);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-27");
@@ -661,13 +664,13 @@ void loop() {
     digitalWriteFast(4,LOW);
     digitalWriteFast(5,HIGH);
     digitalWriteFast(6,HIGH);
-    digitalWriteFast(15,HIGH);
-    delay(wait1);
-    digitalWriteFast(15,LOW);
-    delay(wait2);
     digitalWriteFast(16,HIGH);
     delay(wait1);
     digitalWriteFast(16,LOW);
+    delay(wait2);
+    digitalWriteFast(15,HIGH);
+    delay(wait1);
+    digitalWriteFast(15,LOW);
     delay(wait3);
 
     //Serial.println("W-Deactivate");
@@ -691,13 +694,13 @@ void loop() {
     digitalWriteFast(10,LOW);
     digitalWriteFast(11,LOW);
     digitalWriteFast(12,LOW);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-2");
@@ -707,13 +710,13 @@ void loop() {
     digitalWriteFast(10,LOW);
     digitalWriteFast(11,LOW);
     digitalWriteFast(12,LOW);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-3");
@@ -723,13 +726,13 @@ void loop() {
     digitalWriteFast(10,HIGH);
     digitalWriteFast(11,LOW);
     digitalWriteFast(12,LOW);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-4");
@@ -739,13 +742,13 @@ void loop() {
     digitalWriteFast(10,HIGH);
     digitalWriteFast(11,LOW);
     digitalWriteFast(12,LOW);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-5");
@@ -755,13 +758,13 @@ void loop() {
     digitalWriteFast(10,LOW);
     digitalWriteFast(11,HIGH);
     digitalWriteFast(12,LOW);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-6");
@@ -771,13 +774,13 @@ void loop() {
     digitalWriteFast(10,LOW);
     digitalWriteFast(11,HIGH);
     digitalWriteFast(12,LOW);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-7");
@@ -787,13 +790,13 @@ void loop() {
     digitalWriteFast(10,HIGH);
     digitalWriteFast(11,HIGH);
     digitalWriteFast(12,LOW);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-8");
@@ -803,13 +806,13 @@ void loop() {
     digitalWriteFast(10,HIGH);
     digitalWriteFast(11,HIGH);
     digitalWriteFast(12,LOW);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-9");
@@ -819,13 +822,13 @@ void loop() {
     digitalWriteFast(10,LOW);
     digitalWriteFast(11,LOW);
     digitalWriteFast(12,HIGH);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-10");
@@ -835,13 +838,13 @@ void loop() {
     digitalWriteFast(10,LOW);
     digitalWriteFast(11,LOW);
     digitalWriteFast(12,HIGH);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-11");
@@ -851,13 +854,13 @@ void loop() {
     digitalWriteFast(10,HIGH);
     digitalWriteFast(11,LOW);
     digitalWriteFast(12,HIGH);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-12");
@@ -867,13 +870,13 @@ void loop() {
     digitalWriteFast(10,HIGH);
     digitalWriteFast(11,LOW);
     digitalWriteFast(12,HIGH);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-13");
@@ -883,13 +886,13 @@ void loop() {
     digitalWriteFast(10,LOW);
     digitalWriteFast(11,HIGH);
     digitalWriteFast(12,HIGH);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-14");
@@ -899,13 +902,13 @@ void loop() {
     digitalWriteFast(10,LOW);
     digitalWriteFast(11,HIGH);
     digitalWriteFast(12,HIGH);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-15");
@@ -915,13 +918,13 @@ void loop() {
     digitalWriteFast(10,LOW);
     digitalWriteFast(11,LOW);
     digitalWriteFast(12,LOW);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-16");
@@ -931,13 +934,13 @@ void loop() {
     digitalWriteFast(10,LOW);
     digitalWriteFast(11,LOW);
     digitalWriteFast(12,LOW);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-17");
@@ -947,13 +950,13 @@ void loop() {
     digitalWriteFast(10,HIGH);
     digitalWriteFast(11,LOW);
     digitalWriteFast(12,LOW);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-18");
@@ -963,13 +966,13 @@ void loop() {
     digitalWriteFast(10,HIGH);
     digitalWriteFast(11,LOW);
     digitalWriteFast(12,LOW);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-19");
@@ -979,13 +982,13 @@ void loop() {
     digitalWriteFast(10,LOW);
     digitalWriteFast(11,HIGH);
     digitalWriteFast(12,LOW);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-20");
@@ -995,13 +998,13 @@ void loop() {
     digitalWriteFast(10,LOW);
     digitalWriteFast(11,HIGH);
     digitalWriteFast(12,LOW);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-21");
@@ -1011,13 +1014,13 @@ void loop() {
     digitalWriteFast(10,HIGH);
     digitalWriteFast(11,HIGH);
     digitalWriteFast(12,LOW);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-22");
@@ -1027,13 +1030,13 @@ void loop() {
     digitalWriteFast(10,HIGH);
     digitalWriteFast(11,HIGH);
     digitalWriteFast(12,LOW);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-23");
@@ -1043,13 +1046,13 @@ void loop() {
     digitalWriteFast(10,LOW);
     digitalWriteFast(11,LOW);
     digitalWriteFast(12,HIGH);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-24");
@@ -1059,13 +1062,13 @@ void loop() {
     digitalWriteFast(10,LOW);
     digitalWriteFast(11,LOW);
     digitalWriteFast(12,HIGH);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-25");
@@ -1075,13 +1078,13 @@ void loop() {
     digitalWriteFast(10,HIGH);
     digitalWriteFast(11,LOW);
     digitalWriteFast(12,HIGH);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-26");
@@ -1091,13 +1094,13 @@ void loop() {
     digitalWriteFast(10,HIGH);
     digitalWriteFast(11,LOW);
     digitalWriteFast(12,HIGH);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-27");
@@ -1107,13 +1110,13 @@ void loop() {
     digitalWriteFast(10,LOW);
     digitalWriteFast(11,HIGH);
     digitalWriteFast(12,HIGH);
-    digitalWriteFast(17,HIGH);
-    delay(wait1);
-    digitalWriteFast(17,LOW);
-    delay(wait2);
     digitalWriteFast(18,HIGH);
     delay(wait1);
     digitalWriteFast(18,LOW);
+    delay(wait2);
+    digitalWriteFast(17,HIGH);
+    delay(wait1);
+    digitalWriteFast(17,LOW);
     delay(wait3);
 
     //Serial.println("B-Deactivate");
